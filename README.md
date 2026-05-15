@@ -63,7 +63,7 @@ Buatlah sebuah berkas baru bernama `.env.local` di root direktori proyek Anda, l
 ```env
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL="https://your-project-id.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR...your-anon-key"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="...your-anon-key"
 
 # Database Connections (Prisma/Direct Driver)
 DATABASE_URL="postgresql://postgres:password@your-host.supabase.co:6543/postgres"
