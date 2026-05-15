@@ -1,3 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import Link from "next/link";
@@ -27,9 +30,9 @@ export default function CustomerLandingPage() {
       <section className="relative w-full h-[75vh] md:h-[85vh] rounded-[3rem] overflow-hidden bg-slate-950 mb-16 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-slate-800 flex items-center justify-center text-center mx-auto mt-2 group perspective-1000">
          {/* Abstract Glow Background */}
          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-amber-500/20 rounded-full blur-[100px] animate-pulse pointer-events-none"></div>
-         <div className="absolute bottom-1/4 -right-32 w-[30rem] h-[30rem] bg-indigo-500/20 rounded-full blur-[120px] animate-pulse pointer-events-none" style={{ animationDelay: '2s' }}></div>
+         <div className="absolute bottom-1/4 -right-32 w-120 h-120 bg-indigo-500/20 rounded-full blur-[120px] animate-pulse pointer-events-none" style={{ animationDelay: '2s' }}></div>
          
-         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/20 to-slate-950/90 z-10 transition-opacity duration-700 group-hover:opacity-80"></div>
+         <div className="absolute inset-0 bg-linear-to-b from-slate-950/40 via-slate-950/20 to-slate-950/90 z-10 transition-opacity duration-700 group-hover:opacity-80"></div>
          
          <img 
             src="https://images.unsplash.com/photo-1620882813844-3ceb1ee28e67?q=80&w=2070&auto=format&fit=crop" 
@@ -43,11 +46,11 @@ export default function CustomerLandingPage() {
          </div>
 
          <div className="relative z-20 px-6 max-w-5xl mx-auto flex flex-col items-center mt-12">
-            <h1 className="text-6xl md:text-[5.5rem] font-black tracking-tighter mb-6 leading-[1.1] drop-shadow-2xl text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400">
+            <h1 className="text-6xl md:text-[5.5rem] font-black tracking-tighter mb-6 leading-[1.1] drop-shadow-2xl text-transparent bg-clip-text bg-linear-to-r from-white via-slate-200 to-slate-400">
                Master the Art of <br className="hidden md:block" />
-               <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-200 to-amber-500 relative">
+               <span className="bg-clip-text text-transparent bg-linear-to-r from-amber-200 to-amber-500 relative">
                  Movement.
-                 <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-amber-400/0 via-amber-400 to-amber-400/0 rounded-full blur-sm"></div>
+                 <div className="absolute -bottom-2 left-0 w-full h-1 bg-linear-to-r from-amber-400/0 via-amber-400 to-amber-400/0 rounded-full blur-sm"></div>
                </span>
             </h1>
             <p className="text-lg md:text-xl text-slate-300 mb-12 max-w-2xl text-center font-medium drop-shadow-md">
@@ -66,8 +69,8 @@ export default function CustomerLandingPage() {
 
       {/* Infinite Brand Marquee (Instant Premium Feel) */}
       <section className="mb-24 overflow-hidden border-y border-slate-200 py-10 bg-white relative">
-         <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#F7F7F9] to-transparent z-10 pointer-events-none"></div>
-         <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#F7F7F9] to-transparent z-10 pointer-events-none"></div>
+         <div className="absolute left-0 top-0 bottom-0 w-32 bg-linear-to-r from-[#F7F7F9] to-transparent z-10 pointer-events-none"></div>
+         <div className="absolute right-0 top-0 bottom-0 w-32 bg-linear-to-l from-[#F7F7F9] to-transparent z-10 pointer-events-none"></div>
          
          <div className="text-center mb-6">
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Curating the World's Finest Engineering</span>
@@ -76,17 +79,17 @@ export default function CustomerLandingPage() {
          <div className="w-full overflow-hidden">
             <div className="marquee-container flex items-center text-4xl md:text-5xl font-black text-slate-300 uppercase tracking-tighter gap-0">
                {/* 5 Items */}
-               <div className="w-[250px] text-center flex-shrink-0 hover:text-slate-900 transition-colors cursor-default">Mercedes</div>
-               <div className="w-[250px] text-center flex-shrink-0 hover:text-slate-900 transition-colors cursor-default">BMW</div>
-               <div className="w-[250px] text-center flex-shrink-0 hover:text-slate-900 transition-colors cursor-default">Porsche</div>
-               <div className="w-[250px] text-center flex-shrink-0 hover:text-slate-900 transition-colors cursor-default">Lexus</div>
-               <div className="w-[250px] text-center flex-shrink-0 hover:text-slate-900 transition-colors cursor-default">Tesla</div>
+               <div className="w-[250px] text-center shrink-0 hover:text-slate-900 transition-colors cursor-default">Mercedes</div>
+               <div className="w-[250px] text-center shrink-0 hover:text-slate-900 transition-colors cursor-default">BMW</div>
+               <div className="w-[250px] text-center shrink-0 hover:text-slate-900 transition-colors cursor-default">Porsche</div>
+               <div className="w-[250px] text-center shrink-0 hover:text-slate-900 transition-colors cursor-default">Lexus</div>
+               <div className="w-[250px] text-center shrink-0 hover:text-slate-900 transition-colors cursor-default">Tesla</div>
                {/* Duplicated 5 Items for infinite loop illusion */}
-               <div className="w-[250px] text-center flex-shrink-0 hover:text-slate-900 transition-colors cursor-default">Mercedes</div>
-               <div className="w-[250px] text-center flex-shrink-0 hover:text-slate-900 transition-colors cursor-default">BMW</div>
-               <div className="w-[250px] text-center flex-shrink-0 hover:text-slate-900 transition-colors cursor-default">Porsche</div>
-               <div className="w-[250px] text-center flex-shrink-0 hover:text-slate-900 transition-colors cursor-default">Lexus</div>
-               <div className="w-[250px] text-center flex-shrink-0 hover:text-slate-900 transition-colors cursor-default">Tesla</div>
+               <div className="w-[250px] text-center shrink-0 hover:text-slate-900 transition-colors cursor-default">Mercedes</div>
+               <div className="w-[250px] text-center shrink-0 hover:text-slate-900 transition-colors cursor-default">BMW</div>
+               <div className="w-[250px] text-center shrink-0 hover:text-slate-900 transition-colors cursor-default">Porsche</div>
+               <div className="w-[250px] text-center shrink-0 hover:text-slate-900 transition-colors cursor-default">Lexus</div>
+               <div className="w-[250px] text-center shrink-0 hover:text-slate-900 transition-colors cursor-default">Tesla</div>
             </div>
          </div>
       </section>
@@ -108,9 +111,9 @@ export default function CustomerLandingPage() {
          <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6 h-auto md:h-[500px]">
             
             {/* Box 1 (Large Image Block) - Spans 2 cols, 2 rows */}
-            <div className="md:col-span-2 md:row-span-2 bg-slate-900 rounded-[2rem] p-8 md:p-12 relative overflow-hidden group shadow-lg flex flex-col justify-end min-h-[300px]">
+            <div className="md:col-span-2 md:row-span-2 bg-slate-900 rounded-4xl p-8 md:p-12 relative overflow-hidden group shadow-lg flex flex-col justify-end min-h-[300px]">
                <img src="https://images.unsplash.com/photo-1549317661-bc32c582cece?q=80&w=1200&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-1000 group-hover:opacity-60 mix-blend-overlay" alt="Delivery" />
-               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent"></div>
+               <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-900/60 to-transparent"></div>
                
                <div className="relative z-10">
                   <div className="w-14 h-14 bg-amber-500 rounded-2xl flex items-center justify-center text-white text-2xl mb-6 shadow-lg shadow-amber-500/30 transform -rotate-6 group-hover:rotate-0 transition-transform">
@@ -124,7 +127,7 @@ export default function CustomerLandingPage() {
             </div>
 
             {/* Box 2 (Top Right Text Block) */}
-            <div className="bg-white border border-slate-200 rounded-[2rem] p-8 group hover:-translate-y-1 transition-transform shadow-sm flex flex-col justify-center">
+            <div className="bg-white border border-slate-200 rounded-4xl p-8 group hover:-translate-y-1 transition-transform shadow-sm flex flex-col justify-center">
                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 text-xl mb-6 group-hover:scale-110 transition-transform">
                   ✦
                </div>
@@ -135,7 +138,7 @@ export default function CustomerLandingPage() {
             </div>
 
             {/* Box 3 (Bottom Right Text Block) */}
-            <div className="bg-slate-50 border border-slate-200 rounded-[2rem] p-8 group hover:-translate-y-1 transition-transform shadow-sm flex flex-col justify-center">
+            <div className="bg-slate-50 border border-slate-200 rounded-4xl p-8 group hover:-translate-y-1 transition-transform shadow-sm flex flex-col justify-center">
                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 text-xl mb-6 group-hover:scale-110 transition-transform">
                   ⏱️
                </div>
@@ -158,10 +161,10 @@ export default function CustomerLandingPage() {
          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             {/* Card Left */}
-            <Link href="/customer/car/2" className="group rounded-[2.5rem] overflow-hidden bg-slate-900 relative h-[400px] hover:shadow-2xl transition-shadow flex items-end p-8 border border-slate-200/50">
+            <Link href="/customer/dashboard" className="group rounded-[2.5rem] overflow-hidden bg-slate-900 relative h-[400px] hover:shadow-2xl transition-shadow flex items-end p-8 border border-slate-200/50">
                <div className="absolute inset-0 bg-slate-800">
                   <img src="https://images.unsplash.com/photo-1617531653332-bd46c24f2068?q=80&w=1200&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[10s] opacity-70 group-hover:opacity-90" alt="S-Class"/>
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
+                  <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
                </div>
                <div className="relative z-10 w-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                   <div className="flex justify-between items-end">
@@ -177,10 +180,10 @@ export default function CustomerLandingPage() {
             </Link>
 
             {/* Card Right */}
-            <Link href="/customer/car/5" className="group rounded-[2.5rem] overflow-hidden bg-slate-900 relative h-[400px] hover:shadow-2xl transition-shadow flex items-end p-8 border border-slate-200/50">
+            <Link href="/customer/dashboard" className="group rounded-[2.5rem] overflow-hidden bg-slate-900 relative h-[400px] hover:shadow-2xl transition-shadow flex items-end p-8 border border-slate-200/50">
                <div className="absolute inset-0 bg-slate-800">
                   <img src="https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=1200&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[10s] opacity-70 group-hover:opacity-90" alt="Tesla"/>
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
+                  <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
                </div>
                <div className="relative z-10 w-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                   <div className="flex justify-between items-end">

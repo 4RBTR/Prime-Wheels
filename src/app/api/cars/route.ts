@@ -7,6 +7,18 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const adminId = searchParams.get("adminId");
+    const id = searchParams.get("id");
+
+    if (id) {
+      const { data: car, error } = await supabase
+        .from("cars")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) throw error;
+      return NextResponse.json({ car }, { status: 200 });
+    }
 
     let query = supabase.from("cars").select("*").order("created_at", { ascending: false });
 

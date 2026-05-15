@@ -1,31 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  /* Premium Dark Theme Palette */
-  --primary: #cda434; /* Elegant Gold */
-  --primary-hover: #b89127;
-  --secondary: #2563eb; /* Royal Blue */
-  --accent: #fbbf24;
+  /* Premium Elegant Blue Theme Palette (Pure Light by Default) */
+  --primary: #2563eb; /* Vibrant Royal Blue */
+  --primary-hover: #1d4ed8;
+  --secondary: #0284c7; /* Light Blue */
+  --accent: #3b82f6;
   
-  --background: #000000; /* Pure Black Premium background */
-  --surface: #111111; /* Slightly lighter surface */
-  --surface-elevated: #1a1a1a;
+  --background: #F7F7F9; /* Apple Standard Clean Light Grey */
+  --surface: #ffffff; /* Pure White Cards */
+  --surface-elevated: #ffffff;
   
-  --foreground: #f8fafc; /* Crisp White Text */
-  --foreground-muted: #94a3b8; /* Slate gray text */
+  --foreground: #0f172a; /* Slate 900 Rich Dark Text */
+  --foreground-muted: #64748b; /* Slate 500 Muted Text */
   
-  --border: #333333;
-  --border-light: rgba(255, 255, 255, 0.1);
+  --border: #e2e8f0; /* Slate 200 Delicate Borders */
+  --border-light: #f1f5f9;
   
-  /* Advanced Glassmorphism */
-  --glass-bg: rgba(17, 17, 17, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  /* Advanced Apple-Style Glassmorphism for Light Theme */
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.06);
 
   --radius-sm: 0.5rem;
   --radius-md: 1rem;
   --radius-lg: 1.5rem;
-  --transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 html,
@@ -43,23 +43,31 @@ body {
   line-height: 1.6;
 }
 
+/* Soft Fade In Motion for Every Page */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* Base Glass Utilitiy */
 .glass {
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
 }
 
-/* Micro-animations */
+/* Smooth Hover Micro-animations */
 .hover-lift {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
 }

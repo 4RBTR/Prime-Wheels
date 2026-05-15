@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import "./globals.css";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -20,9 +19,9 @@ export default function UserLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className={`${outfit.variable}`} style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div className={`${outfit.variable} bg-[#F7F7F9] text-slate-900 flex flex-col min-h-screen`}>
       <Navbar />
-      <main style={{ flex: 1 }}>
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 animate-fade-in">
         {children}
       </main>
       <Footer />

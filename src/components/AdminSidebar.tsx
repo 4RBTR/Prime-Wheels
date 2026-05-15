@@ -80,7 +80,7 @@ export default function AdminNavbar({ children }: { children?: React.ReactNode }
             {/* Left: Brand & Navigation */}
             <div className="flex items-center gap-8">
               <div className="shrink-0 flex items-center gap-2 mr-4">
-                <div className="w-8 h-8 rounded-xl bg-slate-900 flex items-center justify-center shadow-sm">
+                <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/20">
                   <span className="text-white font-black text-sm">R</span>
                 </div>
                 <span className="font-extrabold text-lg text-slate-900 tracking-tight">Prime Wheels</span>
@@ -95,7 +95,7 @@ export default function AdminNavbar({ children }: { children?: React.ReactNode }
                       key={item.path}
                       href={item.path}
                       className={`px-4 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2
-                          ${active ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}
+                          ${active ? 'bg-blue-600 text-white shadow-md shadow-blue-600/10' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}
                        `}
                     >
                       <span className={active ? 'text-white' : 'text-slate-400'}>{item.icon}</span>
@@ -147,7 +147,7 @@ export default function AdminNavbar({ children }: { children?: React.ReactNode }
                   href={item.path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-bold
-                          ${isActive(item.path) ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50'}
+                          ${isActive(item.path) ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-50'}
                        `}
                 >
                   {item.icon}
