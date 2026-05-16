@@ -11,12 +11,13 @@
 
 ## ✨ Fitur Utama
 
-*   **🎨 Unified Premium Light Design**: Tampilan minimalis, bersih, dan mewah yang seragam di seluruh platform (Landing Page, Katalog, Admin, & Customer) menggunakan Tailwind CSS v4.
+*   **🎨 Unified Premium Light Design**: Tampilan minimalis, bersih, dan mewah yang seragam di seluruh platform (Landing Page, Admin, & Customer) menggunakan Tailwind CSS v4.
+*   **🔄 Centralized User Dashboard**: Standarisasi alur pengguna (user journey) yang mengarahkan pengguna terautentikasi langsung ke dashboard `/customer` yang bersih dan kohesif untuk melihat katalog dan riwayat penyewaan.
 *   **🔐 Otentikasi Multi-Role (NextAuth.js)**: Akses terproteksi berdasarkan peran (**ADMIN** untuk manajemen fleet & bookings, **USER** untuk melihat histori & penyewaan).
-*   **📂 Real-Time Fleet Management**: Halaman admin yang dapat menambah, mengubah, atau menghapus armada mobil secara langsung yang langsung ter-update di katalog publik tanpa reload berkat integrasi Supabase.
+*   **📂 Real-Time Inventory & Maintenance**: Manajemen armada admin dengan fitur kuantitas stok dinamis (*real-time inventory*) dan kapabilitas "Hold for Maintenance" untuk mobil yang baru saja dikembalikan.
 *   **📑 Modul Checkout Interaktif & e-KYC**: User dapat mengisi periode sewa dan langsung mengunggah dokumen KTP serta Foto Selfie dengan verifikasi visual sebelum melanjutkan transaksi.
-*   **💳 Integrasi Gerbang Pembayaran Midtrans**: Mendukung pembentukan Snap Token dinamis untuk pembayaran transfer bank/kartu kredit asli, lengkap dengan simulasi otomatis (Mock Sandbox Bypass) apabila kunci server API sedang kosong.
-*   **🛡️ Escrow Deposit Automatic Refund**: Penarikan dana titipan wajib demi keamanan unit yang datanya tercatat rapi di database dan detail invoice pembayaran.
+*   **💳 Pembayaran Fleksibel & Midtrans Integration**: Mendukung skema pembayaran Uang Muka (DP) maupun Lunas (Full Payment) dengan verifikasi manual, serta integrasi gerbang pembayaran Midtrans.
+*   **📊 Data-Driven Analytics Dashboard**: Seluruh grafik statistik pada Dasbor Admin terhubung langsung dengan basis data nyata (PostgreSQL/Supabase) untuk kesiapan rilis produksi (Vercel-ready).
 
 ---
 
@@ -93,10 +94,10 @@ Buka browser Anda di tautan [**http://localhost:3000**](http://localhost:3000).
 
 ## 🏢 Struktur Arsitektur Proyek
 
-*   `src/app/(user)/`: Rute publik yang dapat diakses sebelum login (Beranda, Katalog Fleet, Checkout Layanan).
-*   `src/app/customer/`: Dasbor khusus untuk penyewa mobil (Riwayat Reservasi, Status Invoice, Profil KYC).
-*   `src/app/admin/`: Ruang kontrol khusus Admin (Statistik Finansial, Manajemen Unit Mobil, Daftar Pengguna, Penjadwalan).
-*   `src/app/api/`: Serverless RESTful API endpoints (Otentikasi, Checkout Midtrans, Manajemen Pesanan).
+*   `src/app/(user)/`: Rute publik yang dapat diakses sebelum login (Beranda, Landing Page).
+*   `src/app/customer/`: Dasbor terpusat khusus untuk penyewa mobil (Akses Katalog, Riwayat Reservasi, Status Invoice, Profil KYC).
+*   `src/app/admin/`: Ruang kontrol khusus Admin (Statistik Finansial Data-Driven, Manajemen Inventaris & Maintenance, Daftar Pengguna, Verifikasi Pembayaran DP/Lunas).
+*   `src/app/api/`: Serverless RESTful API endpoints (Otentikasi, Checkout Midtrans, Manajemen Pesanan & Operasional).
 *   `src/components/layout/`: Berkas pembangun tampilan navigasi (Navbar & Footer) yang seragam dan responsif.
 *   `src/lib/supabase.ts`: Klien inisialisasi koneksi terpusat untuk Supabase JS SDK.
 
@@ -105,11 +106,11 @@ Buka browser Anda di tautan [**http://localhost:3000**](http://localhost:3000).
 ## 🎯 Cara Penggunaan (Alur Simulasi)
 
 1.  **Akses Dasbor Admin**: Daftarkan akun dengan hak akses `ADMIN` (atau set manual role di database Supabase).
-2.  **Tambahkan Mobil Baru**: Di dasbor admin, akses menu **Fleet** lalu tambahkan satu unit mobil mewah beserta tarif hariannya.
-3.  **Masuk sebagai User**: Registrasi atau login sebagai `USER`. Buka menu **Katalog** di bar navigasi atas. Unit mobil yang ditambahkan Admin tadi akan langsung muncul.
+2.  **Manajemen Inventaris**: Di dasbor admin, akses menu **Fleet** lalu tambahkan unit mobil beserta stok dan tarifnya.
+3.  **Masuk sebagai User**: Registrasi atau login sebagai `USER`. Anda akan otomatis diarahkan ke dasbor terpusat di `/customer`. Buka menu **Katalog** untuk melihat ketersediaan.
 4.  **Lakukan Reservasi**: Pilih mobil, klik **Rent Now**, lalu Anda akan diarahkan ke laman **Checkout**.
-5.  **Verifikasi & Pembayaran**: Masukkan rentang tanggal sewa, unggah KTP & foto selfie tiruan, lalu tekan **Selesaikan & Bayar Sekarang**. 
-6.  Sistem akan menyimpan data ke tabel `bookings`, dan transaksi otomatis terbit secara real-time!
+5.  **Verifikasi & Pembayaran (DP/Lunas)**: Masukkan rentang tanggal sewa, unggah KTP & foto selfie tiruan, dan pilih skema pembayaran (DP atau Full). Selesaikan pembayaran simulasi.
+6.  **Real-Time & Maintenance**: Transaksi Anda akan merubah data stok secara live, dan ketika mobil dikembalikan, status unit dapat diset "Hold for Maintenance" oleh Admin di dasbor.
 
 ---
 
