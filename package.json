@@ -10,7 +10,10 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.4",
+<<<<<<< HEAD
     "@vercel/analytics": "^2.0.1",
+=======
+>>>>>>> 52668a2087676766bfc3f7cb869e38ab02a69bee
     "@vercel/speed-insights": "^2.0.0",
     "bcryptjs": "^3.0.3",
     "lucide-react": "^1.16.0",
