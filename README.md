@@ -9,7 +9,7 @@
 **Prime Wheels** adalah platform penyewaan mobil premium modern yang menggabungkan kemewahan visual dengan keamanan sistem tingkat tinggi. Aplikasi ini dirancang menggunakan kerangka kerja **Next.js 16** terbaru, mengintegrasikan **Supabase Realtime DB**, alur otentikasi tangguh **NextAuth.js**, sistem pembayaran aman **Midtrans**, serta antarmuka elegan bergaya **Premium Apple Light Aesthetic** dengan warna dominan **Royal Blue**.
 
 
-🌐 **Live Demo & Deployment:** [https://prime-wheels.vercel.app](https://prime-wheels.vercel.app) 
+🌐 **Live Demo & Deployment:** [[https://prime-wheels.vercel.app](https://prime-wheels-wheat.vercel.app/)]
 =======
 
 ---
