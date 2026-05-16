@@ -37,7 +37,7 @@
 
 ### **Pembayaran & Autentikasi**
 *   **NextAuth.js (v4)** untuk penanganan sesi login berbasis JWT yang aman.
-*   **Midtrans SDK (Node.js)** untuk manajemen siklus transaksi dan gateway pembayaran digital Indonesia.
+
 
 ---
 
@@ -74,9 +74,7 @@ DIRECT_URL="postgresql://postgres:password@your-host.supabase.co:5432/postgres"
 NEXTAUTH_SECRET="kunci-rahasia-unik-acak-anda"
 NEXTAUTH_URL="http://localhost:3000"
 
-# Midtrans Keys (Kosongkan untuk mengaktifkan mode Simulasi Demo)
-MIDTRANS_SERVER_KEY="SB-Mid-server-your-sandbox-key"
-NEXT_PUBLIC_MIDTRANS_CLIENT_KEY="SB-Mid-client-your-sandbox-key"
+
 ```
 
 > 💡 **Catatan:** Jika Anda mengosongkan `MIDTRANS_SERVER_KEY`, backend akan otomatis mengaktifkan fitur **Simulasi Transaksi Sukses** sehingga Anda tetap bisa mendemokan alur sewa hingga selesai tanpa eror koneksi!
