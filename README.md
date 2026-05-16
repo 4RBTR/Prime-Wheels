@@ -4,8 +4,11 @@
 ![React Version](https://img.shields.io/badge/React-19.2.3-00d8ff?style=for-the-badge&logo=react)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8?style=for-the-badge&logo=tailwindcss)
 ![Supabase](https://img.shields.io/badge/Supabase-Database-3ecf8e?style=for-the-badge&logo=supabase)
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel)
 
 **Prime Wheels** adalah platform penyewaan mobil premium modern yang menggabungkan kemewahan visual dengan keamanan sistem tingkat tinggi. Aplikasi ini dirancang menggunakan kerangka kerja **Next.js 16** terbaru, mengintegrasikan **Supabase Realtime DB**, alur otentikasi tangguh **NextAuth.js**, sistem pembayaran aman **Midtrans**, serta antarmuka elegan bergaya **Premium Apple Light Aesthetic** dengan warna dominan **Royal Blue**.
+
+🌐 **Live Demo & Deployment:** [https://prime-wheels.vercel.app](https://prime-wheels.vercel.app) *(Telah sukses di-deploy ke Vercel)*
 
 ---
 
