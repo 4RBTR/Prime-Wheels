@@ -19,6 +19,8 @@ export default function AddCarForm() {
     transmission: "Automatic",
     seats: 4,
     price_per_day: 0,
+    quantity: 1,
+    admin_status: "Available",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -53,6 +55,8 @@ export default function AddCarForm() {
       submitData.append("transmission", formData.transmission);
       submitData.append("seats", formData.seats.toString());
       submitData.append("price_per_day", formData.price_per_day.toString());
+      submitData.append("quantity", formData.quantity.toString());
+      submitData.append("admin_status", formData.admin_status);
       submitData.append("image", imageFile);
 
       const response = await fetch("/api/cars", {
@@ -191,6 +195,39 @@ export default function AddCarForm() {
                   className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
                   required
                 />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="flex items-center text-sm font-semibold text-slate-700 mb-2">
+                  <Settings className="w-4 h-4 mr-2 text-slate-400" /> Jumlah Unit
+                </label>
+                <input
+                  type="number"
+                  name="quantity"
+                  min="1"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="flex items-center text-sm font-semibold text-slate-700 mb-2">
+                  <Car className="w-4 h-4 mr-2 text-slate-400" /> Status Admin
+                </label>
+                <select
+                  name="admin_status"
+                  value={formData.admin_status}
+                  onChange={handleChange}
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none font-bold"
+                >
+                  <option value="Available">Tersedia (Siap Sewa)</option>
+                  <option value="Maintenance">Maintenance (Dalam Perbaikan)</option>
+                  <option value="Hidden">Hidden (Sembunyikan)</option>
+                </select>
               </div>
             </div>
           </div>

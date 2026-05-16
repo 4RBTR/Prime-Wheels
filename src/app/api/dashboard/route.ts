@@ -12,11 +12,13 @@ export async function GET(req: Request) {
 
     const adminId = session.user.id;
 
-    // Total cars owned by this admin
-    const { count: totalCars } = await supabase
+    // Total cars (sum of quantities)
+    const { data: carsData } = await supabase
       .from("cars")
-      .select("*", { count: "exact", head: true })
-      .eq("admin_id", adminId);
+      .select("quantity")
+      .eq("admin_id", adminId)
+      .neq("admin_status", "Hidden");
+    const totalCars = carsData?.reduce((sum, c) => sum + (c.quantity || 1), 0) || 0;
 
     // Active rentals (On Road)
     const { count: activeRentals } = await supabase
@@ -25,7 +27,7 @@ export async function GET(req: Request) {
       .eq("admin_id", adminId)
       .eq("status", "On Road");
 
-    // Total customers who booked from this admin
+    // Total unique customers
     const { data: bookingUsers } = await supabase
       .from("bookings")
       .select("user_id")
@@ -33,16 +35,25 @@ export async function GET(req: Request) {
     const uniqueCustomers = new Set(bookingUsers?.map(b => b.user_id) || []);
     const totalCustomers = uniqueCustomers.size;
 
-    // Revenue today
-    const today = new Date().toISOString().split("T")[0];
-    const { data: todayTransactions } = await supabase
-      .from("transactions")
-      .select("amount")
+    // Revenue
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    // Fetch all paid bookings for this admin
+    const { data: paidBookings } = await supabase
+      .from("bookings")
+      .select("total_price, updated_at")
       .eq("admin_id", adminId)
-      .eq("status", "Verified")
-      .gte("created_at", `${today}T00:00:00`)
-      .lte("created_at", `${today}T23:59:59`);
-    const revenueToday = todayTransactions?.reduce((sum, t) => sum + t.amount, 0) || 0;
+      .eq("payment_status", "Paid");
+
+    const revenueTotal = paidBookings?.reduce((sum, b) => sum + b.total_price, 0) || 0;
+    
+    const revenueToday = paidBookings?.filter(b => {
+      const date = new Date(b.updated_at);
+      return date >= todayStart && date <= todayEnd;
+    }).reduce((sum, b) => sum + b.total_price, 0) || 0;
 
     // Recent bookings
     const { data: recentBookings } = await supabase
@@ -54,10 +65,11 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       stats: {
-        totalCars: totalCars || 0,
+        totalCars,
         activeRentals: activeRentals || 0,
         totalCustomers,
         revenueToday,
+        revenueTotal,
       },
       recentBookings: recentBookings || [],
     }, { status: 200 });

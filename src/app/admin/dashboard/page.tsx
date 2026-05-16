@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
-import RealtimeChart from "@/components/RealtimeChart";
+import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import Swal from "sweetalert2";
 
 const StatCard = ({ title, value, subtitle }: any) => (
   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
@@ -18,25 +18,54 @@ const StatCard = ({ title, value, subtitle }: any) => (
 const DashboardPage = () => {
   const [stats, setStats] = useState<any>(null);
   const [recentBookings, setRecentBookings] = useState<any[]>([]);
+  const [pendingUsers, setPendingUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchDashboard() {
-      try {
-        const res = await fetch("/api/dashboard");
-        const data = await res.json();
-        if (res.ok) {
-          setStats(data.stats);
-          setRecentBookings(data.recentBookings || []);
-        }
-      } catch (err) {
-        console.error("Failed to fetch dashboard:", err);
-      } finally {
-        setLoading(false);
+  const fetchDashboard = async () => {
+    try {
+      const [resDash, resKyc] = await Promise.all([
+        fetch("/api/dashboard"),
+        fetch("/api/customers/kyc")
+      ]);
+      const dataDash = await resDash.json();
+      const dataKyc = await resKyc.json();
+      
+      if (resDash.ok) {
+        setStats(dataDash.stats);
+        setRecentBookings(dataDash.recentBookings || []);
       }
+      if (resKyc.ok) {
+        setPendingUsers(dataKyc.pendingUsers || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch dashboard:", err);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchDashboard();
   }, []);
+
+  const handleKycStatus = async (userId: string, status: 'Approved' | 'Rejected') => {
+    try {
+      const res = await fetch("/api/customers/kyc", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, status })
+      });
+      if (res.ok) {
+        Swal.fire("Sukses", `User berhasil di ${status}`, "success");
+        fetchDashboard();
+      } else {
+        const error = await res.json();
+        Swal.fire("Gagal", error.error || "Gagal mengubah status", "error");
+      }
+    } catch (err: any) {
+      Swal.fire("Error", err.message, "error");
+    }
+  };
 
   const formatCurrency = (amount: number) => {
     if (amount >= 1000000) return `Rp ${(amount / 1000000).toFixed(1)}M`;
@@ -59,15 +88,59 @@ const DashboardPage = () => {
         <p className="text-slate-500 mt-1">Welcome back. Here&apos;s what&apos;s happening today.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard title="Total Cars" value={stats?.totalCars ?? 0} subtitle="Total fleet managed" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <StatCard title="Total Fleet" value={stats?.totalCars ?? 0} subtitle="Units across all models" />
         <StatCard title="Active Rentals" value={stats?.activeRentals ?? 0} subtitle="Cars currently on the road" />
         <StatCard title="Total Customers" value={stats?.totalCustomers ?? 0} subtitle="Unique renters" />
         <StatCard title="Revenue (Today)" value={formatCurrency(stats?.revenueToday ?? 0)} subtitle="From verified payments" />
+        <StatCard title="Revenue (Total)" value={formatCurrency(stats?.revenueTotal ?? 0)} subtitle="Lifetime earnings" />
       </div>
 
-      <div className="mb-8 w-full">
-         <RealtimeChart />
+      <div className="mb-8 w-full bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+          Pending e-KYC Approvals
+          {pendingUsers.length > 0 && (
+            <span className="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">{pendingUsers.length}</span>
+          )}
+        </h2>
+        {pendingUsers.length === 0 ? (
+          <p className="text-slate-400 text-center py-4">Semua pengguna sudah diverifikasi.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-slate-200 text-slate-500 text-sm">
+                  <th className="py-3 font-medium">Nama</th>
+                  <th className="py-3 font-medium">Email</th>
+                  <th className="py-3 font-medium">Dokumen</th>
+                  <th className="py-3 font-medium text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {pendingUsers.map(user => (
+                  <tr key={user.id} className="text-sm">
+                    <td className="py-4 font-semibold text-slate-800">{user.name}</td>
+                    <td className="py-4 text-slate-500">{user.email}</td>
+                    <td className="py-4">
+                      <div className="flex gap-3">
+                        {user.ktp_url && <a href={user.ktp_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">Lihat KTP</a>}
+                        {user.selfie_url && <a href={user.selfie_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">Lihat Selfie</a>}
+                      </div>
+                    </td>
+                    <td className="py-4 flex gap-2 justify-end">
+                      <button onClick={() => handleKycStatus(user.id, 'Approved')} className="p-2 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg" title="Setujui">
+                        <CheckCircle size={18} />
+                      </button>
+                      <button onClick={() => handleKycStatus(user.id, 'Rejected')} className="p-2 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg" title="Tolak">
+                        <XCircle size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

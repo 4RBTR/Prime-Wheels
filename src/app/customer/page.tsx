@@ -8,7 +8,28 @@ import { useEffect, useState } from "react";
 
 export default function CustomerLandingPage() {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [featuredCars, setFeaturedCars] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setMounted(true);
+    const fetchCars = async () => {
+      try {
+        const res = await fetch("/api/cars");
+        const data = await res.json();
+        if (res.ok) {
+          // Filter only available cars and take top 2 for the "Garage" section
+          const available = data.cars?.filter((c: any) => c.admin_status === 'Available') || [];
+          setFeaturedCars(available.slice(0, 2));
+        }
+      } catch (err) {
+        console.error("Failed to fetch cars:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCars();
+  }, []);
 
   return (
     <div className={`transition-opacity duration-1000 pb-10 overflow-hidden ${mounted ? 'opacity-100' : 'opacity-0'}`}>
@@ -158,47 +179,45 @@ export default function CustomerLandingPage() {
             <h2 className="text-4xl font-black text-slate-900 tracking-tight">The Garage</h2>
          </div>
 
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            
-            {/* Card Left */}
-            <Link href="/customer/dashboard" className="group rounded-[2.5rem] overflow-hidden bg-slate-900 relative h-[400px] hover:shadow-2xl transition-shadow flex items-end p-8 border border-slate-200/50">
-               <div className="absolute inset-0 bg-slate-800">
-                  <img src="https://images.unsplash.com/photo-1617531653332-bd46c24f2068?q=80&w=1200&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[10s] opacity-70 group-hover:opacity-90" alt="S-Class"/>
-                  <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
-               </div>
-               <div className="relative z-10 w-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                  <div className="flex justify-between items-end">
-                     <div>
-                        <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest block w-max mb-3">Premium Sedan</span>
-                        <h3 className="text-3xl font-black text-white">Mercedes S450</h3>
-                     </div>
-                     <span className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-900 transform group-hover:rotate-45 transition-transform duration-300">
-                        ↗
-                     </span>
+         {loading ? (
+            <div className="flex justify-center py-20">
+               <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+         ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+               {featuredCars.length > 0 ? (
+                  featuredCars.map((car: any) => (
+                     <Link key={car.id} href="/customer/dashboard" className="group rounded-[2.5rem] overflow-hidden bg-slate-900 relative h-[400px] hover:shadow-2xl transition-shadow flex items-end p-8 border border-slate-200/50">
+                        <div className="absolute inset-0 bg-slate-800">
+                           <img 
+                              src={car.image_url || "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?q=80&w=1200&auto=format&fit=crop"} 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[10s] opacity-70 group-hover:opacity-90" 
+                              alt={car.name}
+                           />
+                           <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
+                        </div>
+                        <div className="relative z-10 w-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                           <div className="flex justify-between items-end">
+                              <div>
+                                 <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest block w-max mb-3">
+                                    {car.type} &bull; {car.transmission}
+                                 </span>
+                                 <h3 className="text-3xl font-black text-white">{car.brand} {car.name}</h3>
+                              </div>
+                              <span className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-900 transform group-hover:rotate-45 transition-transform duration-300 font-bold">
+                                 ↗
+                              </span>
+                           </div>
+                        </div>
+                     </Link>
+                  ))
+               ) : (
+                  <div className="col-span-full py-20 text-center text-slate-400 font-bold border-2 border-dashed border-slate-200 rounded-[2.5rem]">
+                     Belum ada unit yang tersedia di garasi saat ini.
                   </div>
-               </div>
-            </Link>
-
-            {/* Card Right */}
-            <Link href="/customer/dashboard" className="group rounded-[2.5rem] overflow-hidden bg-slate-900 relative h-[400px] hover:shadow-2xl transition-shadow flex items-end p-8 border border-slate-200/50">
-               <div className="absolute inset-0 bg-slate-800">
-                  <img src="https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=1200&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[10s] opacity-70 group-hover:opacity-90" alt="Tesla"/>
-                  <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
-               </div>
-               <div className="relative z-10 w-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                  <div className="flex justify-between items-end">
-                     <div>
-                        <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest block w-max mb-3">Electric Hypercar</span>
-                        <h3 className="text-3xl font-black text-white">Tesla Plaid</h3>
-                     </div>
-                     <span className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-900 transform group-hover:rotate-45 transition-transform duration-300">
-                        ↗
-                     </span>
-                  </div>
-               </div>
-            </Link>
-
-         </div>
+               )}
+            </div>
+         )}
          
          <div className="text-center mt-12">
             <Link href="/customer/dashboard" className="inline-flex items-center gap-3 text-slate-900 font-black hover:text-amber-500 transition-colors uppercase tracking-widest text-sm border-b-2 border-slate-900 hover:border-amber-500 pb-1">

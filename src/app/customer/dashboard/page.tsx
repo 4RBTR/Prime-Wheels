@@ -147,7 +147,7 @@ export default function CustomerDashboard() {
                   </div>
                   
                   {car.is_available ? (
-                     <Link href={`/checkout?carId=${car.id}`} className="px-6 py-3 rounded-2xl font-bold transition-all shadow-md bg-slate-900 hover:bg-slate-800 text-white inline-block hover:scale-[1.02] active:scale-95 duration-200">
+                     <Link href={`/customer/checkout?carId=${car.id}`} className="px-6 py-3 rounded-2xl font-bold transition-all shadow-md bg-slate-900 hover:bg-slate-800 text-white inline-block hover:scale-[1.02] active:scale-95 duration-200">
                         Rent Now
                      </Link>
                   ) : (
