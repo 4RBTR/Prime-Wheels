@@ -81,7 +81,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
               </div>
 
               {/* Desktop Navigation Links */}
-              <nav className="hidden md:flex items-center space-x-2">
+              <nav className="hidden lg:flex items-center space-x-2">
                 {navItems.map((item) => {
                   const active = isActive(item.path);
                   return (
@@ -128,7 +128,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
             {/* Mobile Burger Controls */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden text-slate-500 hover:text-slate-900 p-2"
+              className="lg:hidden text-slate-500 hover:text-slate-900 p-2"
             >
               {mobileMenuOpen ? Icons.Close : Icons.Menu}
             </button>
@@ -137,7 +137,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
 
         {/* Mobile Interactive Dropdown Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-slate-200 bg-white shadow-lg">
+          <div className="lg:hidden border-t border-slate-200 bg-white shadow-lg">
             <nav className="px-4 py-4 space-y-2">
               {navItems.map((item) => (
                 <Link

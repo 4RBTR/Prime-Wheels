@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, CheckCircle, XCircle, X } from "lucide-react";
 import Swal from "sweetalert2";
 
 const StatCard = ({ title, value, subtitle }: any) => (
@@ -20,6 +20,7 @@ const DashboardPage = () => {
   const [recentBookings, setRecentBookings] = useState<any[]>([]);
   const [pendingUsers, setPendingUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modalImage, setModalImage] = useState<{ url: string; title: string } | null>(null);
 
   const fetchDashboard = async () => {
     try {
@@ -123,8 +124,22 @@ const DashboardPage = () => {
                     <td className="py-4 text-slate-500">{user.email}</td>
                     <td className="py-4">
                       <div className="flex gap-3">
-                        {user.ktp_url && <a href={user.ktp_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">Lihat KTP</a>}
-                        {user.selfie_url && <a href={user.selfie_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">Lihat Selfie</a>}
+                        {user.ktp_url && (
+                          <button 
+                            onClick={() => setModalImage({ url: user.ktp_url, title: `KTP: ${user.name}` })}
+                            className="text-blue-600 hover:underline font-semibold cursor-pointer"
+                          >
+                            Lihat KTP
+                          </button>
+                        )}
+                        {user.selfie_url && (
+                          <button 
+                            onClick={() => setModalImage({ url: user.selfie_url, title: `Selfie: ${user.name}` })}
+                            className="text-blue-600 hover:underline font-semibold cursor-pointer"
+                          >
+                            Lihat Selfie
+                          </button>
+                        )}
                       </div>
                     </td>
                     <td className="py-4 flex gap-2 justify-end">
@@ -189,6 +204,49 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Elegant & Fully Responsive Image Modal (Popup) */}
+      {modalImage && (
+        <div 
+          className="fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in"
+          onClick={() => setModalImage(null)}
+        >
+          <div 
+            className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col relative border border-slate-200 transform scale-100 animate-scale-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <h3 className="font-black text-slate-900 text-base uppercase tracking-wider">{modalImage.title}</h3>
+              <button 
+                onClick={() => setModalImage(null)}
+                className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="p-6 bg-slate-100 flex items-center justify-center overflow-auto max-h-[60vh]">
+              <img 
+                src={modalImage.url} 
+                alt={modalImage.title} 
+                className="max-w-full max-h-full object-contain rounded-2xl shadow-sm border border-slate-200/50" 
+              />
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-slate-100 flex justify-end bg-slate-50">
+              <button
+                onClick={() => setModalImage(null)}
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black transition-colors"
+              >
+                Tutup Dokumen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

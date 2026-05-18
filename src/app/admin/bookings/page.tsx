@@ -1,15 +1,40 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, CheckCircle, XCircle, X } from "lucide-react";
 import Swal from "sweetalert2";
 
+interface BookingType {
+  id: string;
+  booking_code: string;
+  user_id: string;
+  car_id: string;
+  start_date: string;
+  end_date: string;
+  total_price: number;
+  status: string;
+  payment_status: string;
+  payment_dp_url?: string;
+  payment_full_url?: string;
+  users?: {
+    name: string;
+    email: string;
+  };
+  cars?: {
+    name: string;
+    brand: string;
+    type: string;
+    price_per_day: number;
+    image_url: string;
+  };
+}
+
 export default function BookingsPage() {
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<BookingType[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("All");
-  const [manageBooking, setManageBooking] = useState<any>(null);
+  const [manageBooking, setManageBooking] = useState<BookingType | null>(null);
+  const [modalImage, setModalImage] = useState<{ url: string; title: string } | null>(null);
 
   const fetchBookings = async () => {
     try {
@@ -66,8 +91,8 @@ export default function BookingsPage() {
       } else {
         Swal.fire("Gagal", data.message || "Gagal memperbarui", "error");
       }
-    } catch (error: any) {
-      Swal.fire("Error", error.message, "error");
+    } catch (error: unknown) {
+      Swal.fire("Error", error instanceof Error ? error.message : "Terjadi kesalahan", "error");
     }
   };
 
@@ -86,8 +111,8 @@ export default function BookingsPage() {
       } else {
         Swal.fire("Gagal", data.message || "Gagal memperbarui", "error");
       }
-    } catch (error: any) {
-      Swal.fire("Error", error.message, "error");
+    } catch (error: unknown) {
+      Swal.fire("Error", error instanceof Error ? error.message : "Terjadi kesalahan", "error");
     }
   };
 
@@ -132,7 +157,7 @@ export default function BookingsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
-              {filteredBookings.map((booking: any) => (
+              {filteredBookings.map((booking) => (
                 <tr key={booking.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="p-4 font-mono text-sm font-bold text-slate-600">{booking.booking_code}</td>
                   <td className="p-4">
@@ -198,9 +223,15 @@ export default function BookingsPage() {
                   <h3 className="font-bold text-amber-900 mb-4">Verifikasi Pembayaran DP (30%)</h3>
                   <div className="mb-4">
                     <span className="block text-amber-800 text-sm mb-2">Bukti Transfer DP:</span>
-                    <a href={manageBooking.payment_dp_url} target="_blank" rel="noreferrer">
-                      <img src={manageBooking.payment_dp_url} alt="Bukti DP" className="max-w-xs rounded-xl border border-amber-200 shadow-sm hover:opacity-90 transition-opacity" />
-                    </a>
+                    <div 
+                      onClick={() => setModalImage({ url: manageBooking.payment_dp_url!, title: `Bukti DP: ${manageBooking.booking_code}` })}
+                      className="cursor-pointer group relative max-w-xs overflow-hidden rounded-xl border border-amber-200 shadow-sm"
+                    >
+                      <img src={manageBooking.payment_dp_url} alt="Bukti DP" className="w-full h-auto object-contain max-h-48 hover:opacity-90 transition-all hover:scale-[1.02]" />
+                      <div className="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                        <span className="bg-slate-900/80 text-white text-[10px] font-bold px-2 py-1 rounded-md">Zoom Gambar</span>
+                      </div>
+                    </div>
                   </div>
                   <div className="flex gap-3">
                     <button onClick={() => handlePaymentApproval(manageBooking.id, 'APPROVE_DP')} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-bold text-sm">
@@ -219,9 +250,15 @@ export default function BookingsPage() {
                   <h3 className="font-bold text-blue-900 mb-4">Verifikasi Pelunasan</h3>
                   <div className="mb-4">
                     <span className="block text-blue-800 text-sm mb-2">Bukti Transfer Pelunasan:</span>
-                    <a href={manageBooking.payment_full_url} target="_blank" rel="noreferrer">
-                      <img src={manageBooking.payment_full_url} alt="Bukti Pelunasan" className="max-w-xs rounded-xl border border-blue-200 shadow-sm hover:opacity-90 transition-opacity" />
-                    </a>
+                    <div 
+                      onClick={() => setModalImage({ url: manageBooking.payment_full_url!, title: `Bukti Pelunasan: ${manageBooking.booking_code}` })}
+                      className="cursor-pointer group relative max-w-xs overflow-hidden rounded-xl border border-blue-200 shadow-sm"
+                    >
+                      <img src={manageBooking.payment_full_url} alt="Bukti Pelunasan" className="w-full h-auto object-contain max-h-48 hover:opacity-90 transition-all hover:scale-[1.02]" />
+                      <div className="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                        <span className="bg-slate-900/80 text-white text-[10px] font-bold px-2 py-1 rounded-md">Zoom Gambar</span>
+                      </div>
+                    </div>
                   </div>
                   <div className="flex gap-3">
                     <button onClick={() => handlePaymentApproval(manageBooking.id, 'APPROVE_FULL')} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-bold text-sm">
@@ -291,6 +328,49 @@ export default function BookingsPage() {
                   )}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Elegant & Fully Responsive Image Modal (Popup) */}
+      {modalImage && (
+        <div 
+          className="fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in"
+          onClick={() => setModalImage(null)}
+        >
+          <div 
+            className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col relative border border-slate-200 transform scale-100 animate-scale-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <h3 className="font-black text-slate-900 text-base uppercase tracking-wider">{modalImage.title}</h3>
+              <button 
+                onClick={() => setModalImage(null)}
+                className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="p-6 bg-slate-100 flex items-center justify-center overflow-auto max-h-[60vh]">
+              <img 
+                src={modalImage.url} 
+                alt={modalImage.title} 
+                className="max-w-full max-h-full object-contain rounded-2xl shadow-sm border border-slate-200/50" 
+              />
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-slate-100 flex justify-end bg-slate-50">
+              <button
+                onClick={() => setModalImage(null)}
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black transition-colors"
+              >
+                Tutup Dokumen
+              </button>
             </div>
           </div>
         </div>

@@ -136,7 +136,7 @@ export default function AdminNavbar({ children }: { children?: React.ReactNode }
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden text-slate-500 hover:text-slate-900 p-2"
+              className="lg:hidden text-slate-500 hover:text-slate-900 p-2"
             >
               {mobileMenuOpen ? Icons.Close : Icons.Menu}
             </button>
@@ -145,7 +145,7 @@ export default function AdminNavbar({ children }: { children?: React.ReactNode }
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-slate-200 bg-white shadow-lg">
+          <div className="lg:hidden border-t border-slate-200 bg-white shadow-lg">
             <nav className="px-4 py-4 space-y-2">
               {navItems.map((item) => (
                 <Link
