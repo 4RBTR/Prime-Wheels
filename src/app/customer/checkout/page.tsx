@@ -5,6 +5,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { UploadCloud, ShieldCheck, CheckCircle2, Calendar, AlertCircle, Loader2, ArrowLeft } from 'lucide-react';
+import { compressImage } from '@/lib/image-compression';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import Swal from 'sweetalert2';
@@ -104,11 +105,13 @@ function CheckoutContent() {
       setIsLoading(true);
       setErrorMessage("");
 
+      const compressedDpProof = await compressImage(dpProof);
+
       const formData = new FormData();
       formData.append("carId", car.id.toString());
       formData.append("startDate", new Date(startDate).toISOString());
       formData.append("endDate", new Date(endDate).toISOString());
-      formData.append("dpProof", dpProof);
+      formData.append("dpProof", compressedDpProof);
       formData.append("quantity", quantity.toString());
 
       const res = await fetch("/api/checkout", {

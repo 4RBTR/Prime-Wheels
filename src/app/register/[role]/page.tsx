@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Swal from "sweetalert2";
 import { Loader2, ArrowLeft, Upload, Car } from "lucide-react";
+import { compressImage } from "@/lib/image-compression";
 
 export default function RegistrationForm() {
   const router = useRouter();
@@ -39,16 +40,23 @@ export default function RegistrationForm() {
     e.preventDefault();
     setLoading(true);
 
-    const submitData = new FormData();
-    submitData.append("name", formData.name);
-    submitData.append("email", formData.email);
-    submitData.append("password", formData.password);
-    submitData.append("role", role);
-    submitData.append("city", formData.city);
-    if (ktpFile) submitData.append("ktp", ktpFile);
-    if (selfieFile) submitData.append("selfie", selfieFile);
-
     try {
+      const submitData = new FormData();
+      submitData.append("name", formData.name);
+      submitData.append("email", formData.email);
+      submitData.append("password", formData.password);
+      submitData.append("role", role);
+      submitData.append("city", formData.city);
+
+      if (ktpFile) {
+        const compressedKtp = await compressImage(ktpFile);
+        submitData.append("ktp", compressedKtp);
+      }
+      if (selfieFile) {
+        const compressedSelfie = await compressImage(selfieFile);
+        submitData.append("selfie", compressedSelfie);
+      }
+
       const res = await fetch("/api/register", {
         method: "POST",
         body: submitData,
