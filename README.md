@@ -135,37 +135,29 @@ Untuk menjaga transparansi pengelolaan armada, sistem kami menggunakan tabel sta
 
 ## ✨ Fitur Unggulan Utama (Premium Features)
 
-### 1. 📂 Sistem Verifikasi e-KYC Cepat & Interaktif (`/admin/customers`)
-* **Persetujuan Langsung (Direct Review):** Memungkinkan admin untuk meninjau secara real-time status verifikasi identitas pengguna langsung dari daftar pelanggan. Admin dapat menyetujui (`Approve`) atau menolak (`Reject`) e-KYC dalam hitungan detik.
-* **Keamanan Integrasi:** Menggunakan dialog berbasis state yang ditenagai oleh **SweetAlert2** untuk mencegah kesalahan penekanan tombol. Menghubungkan client-side state secara langsung ke endpoint RESTful backend `/api/customers/kyc` untuk memperbarui kolom status e-KYC pengguna di PostgreSQL secara instan.
+Untuk memastikan pengalaman kelas bisnis, Prime Wheels dilengkapi dengan fitur-fitur mutakhir yang mengatasi berbagai kendala operasional secara cerdas:
 
-### 2. 📊 Detail Pelanggan & Statistik Transaksi Komprehensif
-* **Accordion Detail Panel:** Setiap kartu pelanggan pada direktori admin dapat diekspansi secara interaktif untuk menampilkan data komprehensif:
-  * **Dashboard Finansial Mikro:** Menampilkan indikator statistik penting seperti *Total Penyewaan (Sewa)*, *Total Pengeluaran Akumulatif (diformat dalam standar Rupiah IDR)*, serta *Tanggal Reservasi Terakhir*.
-  * **Nested Transactional Table:** Tabel riwayat transaksi penyewaan khusus pengguna yang mencakup Kode Booking unik, Merek/Tipe Mobil, Durasi Periode Sewa, Total Nominal Transaksi, Status Operasional (On Road, Returned, Cancelled), dan Status Pembayaran (Paid, DP Paid, Pending).
-
-### 3. 🖼️ In-App Document Preview Modal (Anti Pindah Tab)
-* **Visual Viewer Premium:** Mengeliminasi tautan eksternal lawas (`target="_blank"`) yang mengganggu kenyamanan pengguna di smartphone. Foto KTP, Selfie verifikasi wajah, serta Bukti Transfer DP/Pelunasan kini langsung ditampilkan di dalam **Floating Preview Modal** beresolusi tinggi di dalam aplikasi.
-* **Aksesibilitas Tinggi:** Modal dilengkapi dengan efek latar belakang blur (`backdrop-blur`), animasi transisi yang mulus, dan kontrol batasan tinggi (`max-height`) yang disesuaikan secara otomatis untuk segala ukuran layar.
-
-### 🗜️ 4. Client-Side Smart Image Compression Utility
-* **Solusi Payload Vercel:** Menyelesaikan kendala batasan ukuran payload serverless function pada Vercel (`413 Payload Too Large` / batas maksimum 4.5MB).
-* **HTML5 Canvas Compression:** Foto e-KYC atau bukti bayar berukuran besar hingga 10MB secara otomatis dikompresi di sisi browser menggunakan utilitas cerdas [image-compression.ts](file:///c:/Tugas%20Produktif/Project%20KIK/Prime%20wheels/src/lib/image-compression.ts) menjadi berukuran di bawah **500KB** sebelum ditransmisikan. Kualitas teks dokumen (KTP) dan bukti transfer tetap terjaga dengan sangat tajam tanpa kehilangan aspek penting data.
+| Fitur Unggulan | Cara Kerja & Interaksi | Solusi / Masalah yang Diselesaikan |
+| :--- | :--- | :--- |
+| 📂 **e-KYC Instant Review** | Verifikasi (Approve/Reject) status identitas pelanggan langsung dari daftar utama. | Proses instan dengan proteksi **SweetAlert2** untuk mencegah salah klik. |
+| 📊 **Accordion Customer Detail** | Baris kartu pelanggan dapat diekspansi untuk membuka dasbor analitik finansial mikro. | Memantau *Total Pengeluaran (Rupiah)* & tabel riwayat transaksi sewa per pelanggan. |
+| 🖼️ **In-App Document Modal** | Menampilkan foto KTP, selfie, atau bukti bayar di dalam popup floating berlatar belakang blur. | Navigasi nyaman di HP & tablet tanpa perlu membuka/pindah tab browser baru. |
+| 🗜️ **Smart Canvas Compressor** | Secara otomatis menyusutkan ukuran foto dokumen (hingga 10MB) menjadi di bawah **500KB**. | Mengeliminasi error serverless Vercel **`413 Payload Too Large`** dengan teks tetap tajam. |
 
 ---
 
 ## 🛠️ Stack Teknologi & Modul Dependensi
 
-### **Frontend & Interface**
-* **Next.js 16.1.1 & React 19.2.3 (App Router):** Pondasi utama yang menggunakan server-side rendering (SSR) untuk SEO optimal dan client-side hydration (CSR) untuk interaksi kilat.
-* **Tailwind CSS v4 & PostCSS:** Framework utility-first untuk desain responsif dan penataan gaya modern tanpa beban file CSS konvensional yang lambat.
-* **Lucide React Icons:** Visualisasi ikon SVG tajam dan modern yang seragam di seluruh platform.
-* **Recharts 3.8.1:** Pustaka visualisasi grafik data-driven untuk menyajikan grafik pendapatan dan analitik di dasbor admin.
+Arsitektur aplikasi ini dirancang menggunakan kombinasi teknologi modern berperforma tinggi:
 
-### **Backend & Keamanan**
-* **Supabase Database (PostgreSQL):** Basis data utama berkinerja tinggi untuk menjaga integritas data relasional.
-* **NextAuth.js 4.24.14:** Penanganan otentikasi sesi terproteksi berbasis JSON Web Token (JWT) dengan skema multi-role (`ADMIN` dan `USER`).
-* **Bcrypt.js 3.0.3:** Protokol pengamanan kata sandi pengguna berbasis enkripsi hashing satu arah sebelum disimpan ke database.
+| Kategori | Stack Teknologi | Versi | Peran Utama & Solusi |
+| :--- | :--- | :--- | :--- |
+| 🖥️ **Core Engine** | **Next.js & React** | `16.1.1` / `19.2.3` | App Router untuk SEO optimal (SSR) dan interaksi kilat (CSR). |
+| 🎨 **Design System** | **Tailwind CSS v4** | `v4.x` | Desain Apple Premium Aesthetic yang ultra responsif & adaptif. |
+| 📊 **Analytics UI** | **Recharts & Lucide** | `3.8.1` / `Latest` | Penyajian grafik analitik pendapatan & ikon SVG yang konsisten. |
+| 💾 **Database** | **Supabase (PostgreSQL)**| `Latest` | Penyimpanan data relasional aman terproteksi Row Level Security (RLS). |
+| 🔑 **Authentication** | **NextAuth.js** | `4.24.14` | Proteksi rute & manajemen sesi JWT untuk Multi-Role (ADMIN & USER). |
+| 🔒 **Cryptography** | **Bcrypt.js** | `3.0.3` | Enkripsi hashing satu arah yang sangat kuat untuk mengamankan password. |
 
 ---
 
