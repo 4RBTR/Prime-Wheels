@@ -434,18 +434,66 @@ Semua endpoint API terletak di direktori `/api/` dan dilindungi dengan verifikas
 
 ## 🏢 Panduan Alur Pengguna (User Journey Walkthrough)
 
-### **A. Alur Pelanggan (Customer Journey)**
-1. **Pendaftaran Akun:** Masuk ke halaman `/register` lalu pilih peran sebagai Pelanggan (`USER`).
-2. **Unggah Dokumen e-KYC:** Pada dasbor profil `/customer/profile`, unggah foto KTP serta Selfie KTP Anda. Utilitas kompresor canvas otomatis bekerja di belakang layar untuk mengecilkan file Anda sebelum diunggah ke database.
-3. **Pencarian & Pemesanan:** Buka menu **Katalog**, tentukan mobil impian Anda (misalnya BMW X7), masukkan tanggal mulai & akhir sewa, tentukan jumlah unit mobil yang disewa, dan pilih skema bayar (DP atau Lunas).
-4. **Pembayaran Uang Muka (DP):** Jika memilih DP, unggah bukti transfer DP Anda. Status pesanan akan berubah menjadi `Awaiting DP Verification`.
-5. **Serah Terima Kunci & Pelunasan:** Setelah DP disetujui, mobil siap diambil (`Ready for Pickup`). Sebelum kunci diserahkan di kantor sewa, unggah bukti pelunasan biaya untuk mengubah status pembayaran menjadi lunas (`Paid`).
+Untuk mempermudah tim operasional maupun penguji memahami alur kerja aplikasi, berikut adalah panduan alur interaksi terperinci yang memetakan tindakan pengguna, antarmuka layar (UI), dan dampak teknis di sistem backend:
 
-### **B. Alur Administrasi (Admin Dashboard)**
-1. **Manajemen Armada (Fleet):** Admin mendaftarkan model mobil baru beserta jumlah unit fisik yang siap jalan.
-2. **Review KYC Pelanggan:** Admin membuka menu **Customers**, mengklik kartu penyewa untuk mengekspansi detail, lalu mengklik tombol **Lihat KTP** atau **Lihat Selfie** untuk membuka Popup Modal responsif. Setelah divalidasi, klik tombol **Setujui KYC**.
-3. **Verifikasi Pembayaran & Rilis Mobil:** Admin membuka detail booking yang masuk, melihat gambar bukti bayar via modal internal, lalu menyetujui DP. Ketika pelanggan tiba untuk mengambil mobil, admin mengubah status menjadi `On Road` (Sedang Disewa).
-4. **Pengembalian & Pemeliharaan Parsial:** Saat mobil dikembalikan, jika unit mengalami kendala teknis, admin memilih opsi **Kembalikan & Hold** agar mobil masuk ke antrean servis secara parsial, memastikan unit tidak bisa disewa oleh pelanggan lain untuk sementara waktu. Jika servis selesai, admin menekan tombol 🛠 **Selesai Perawatan** di tabel Fleet.
+### 👤 A. Alur Perjalanan Pelanggan (Customer Experience Flow)
+
+```
+[ Registrasi ] ➔ [ Lengkapi e-KYC ] ➔ [ Pilih Mobil & Unit ] ➔ [ Unggah DP 30% ] ➔ [ Ambil Unit & Pelunasan ]
+```
+
+#### **1. Registrasi Akun Eksklusif**
+* 📍 **Tindakan Pengguna:** Mengisi nama, email, dan kata sandi di halaman `/register` dengan memilih peran sebagai Pelanggan (`USER`).
+* 🖥️ **Tampilan UI:** Form pendaftaran bergaya Apple Premium Light yang bersih dengan validasi form waktu nyata.
+* ⚙️ **Dampak Sistem:** Kredensial kata sandi di-hash menggunakan algoritma **Bcrypt.js**, data dimasukkan ke tabel `users` dengan nilai kolom `role: 'USER'` dan `kyc_status: 'Pending'`.
+
+#### **2. Pelengkapan e-KYC Pintar**
+* 📍 **Tindakan Pengguna:** Membuka menu profil `/customer/profile`, mengambil foto KTP dan foto selfie wajah langsung dari smartphone, lalu menekan tombol **Simpan Dokumen**.
+* 🖥️ **Tampilan UI:** Kartu upload file drag-and-drop dengan pratinjau gambar instan.
+* ⚙️ **Dampak Sistem:** Utilitas kompresor canvas [image-compression.ts](file:///c:/Tugas%20Produktif/Project%20KIK/Prime%20wheels/src/lib/image-compression.ts) otomatis menyusutkan resolusi & ukuran file (dari ~8MB menjadi <400KB), mengunggahnya ke bucket penyimpanan cloud, dan memperbarui kolom `ktp_url` & `selfie_url` di tabel `users`.
+
+#### **3. Pemilihan Armada & Kontrol Kuantitas**
+* 📍 **Tindakan Pengguna:** Menjelajahi menu **Katalog**, memilih mobil mewah (misalnya: Mercedes-Benz S-Class), menentukan tanggal mulai/selesai sewa, dan mengatur jumlah unit mobil sewa.
+* 🖥️ **Tampilan UI:** Widget pemilih tanggal visual dan selector kuantitas dinamis yang terkunci/dibatasi oleh batas stok riil mobil tersebut.
+* ⚙️ **Dampak Sistem:** Sistem memanggil fungsi RPC database `check_car_availability` untuk memastikan jumlah unit yang diminta masih tersedia di gudang fisik pada rentang tanggal sewa tersebut sebelum mengizinkan klik tombol sewa.
+
+#### **4. Pengajuan Checkout & Bukti Transfer DP**
+* 📍 **Tindakan Pengguna:** Memilih opsi pembayaran Uang Muka (DP 30%), meninjau total biaya, menyalin nomor rekening bank Prime Wheels, melakukan transfer bank, mengunggah screenshot bukti transfer DP, dan menekan **Submit Payment**.
+* 🖥️ **Tampilan UI:** Halaman rincian kalkulasi harga (Tarif dasar + Pajak 11% + Biaya Deposit Refundable), instruksi transfer QRIS/Rekening, dan form unggah bukti transfer DP.
+* ⚙️ **Dampak Sistem:** Membuat pesanan baru di tabel `bookings` dengan `status: 'Awaiting Payment'` dan `payment_status: 'Awaiting DP Verification'`, serta mengurangi sisa kuantitas mobil yang siap disewa untuk penyewa lain pada periode tanggal tersebut.
+
+#### **5. Pengambilan Unit & Pelunasan Akhir**
+* 📍 **Tindakan Pengguna:** Setelah status berubah menjadi disetujui, pelanggan mendatangi kantor rental, mengunggah bukti transfer pelunasan sisa biaya sewa (70%), menerima kunci fisik dari admin, dan mulai berkendara.
+* 🖥️ **Tampilan UI:** Halaman detail reservasi aktif `/customer/bookings` yang menampilkan tombol unggah bukti pelunasan dan tombol download Invoice PDF digital.
+* ⚙️ **Dampak Sistem:** Memperbarui kolom `payment_full_url` di database. Setelah pembayaran 100% lunas, status berganti menjadi `Paid` dan status sewa kendaraan diset ke `On Road`.
+
+---
+
+### 🔑 B. Alur Operasional Administrasi (Admin Operations Flow)
+
+```
+[ Input Fleet Mobil ] ➔ [ Audit e-KYC Modal ] ➔ [ Validasi Bukti Transfer ] ➔ [ Kontrol Servis Berkala ]
+```
+
+#### **1. Pengisian Aset Armada (Fleet Management)**
+* 📍 **Tindakan Admin:** Membuka menu **Fleet** lalu mengklik tombol **Add New Car**. Memasukkan detail merek, nama model, kategori tipe, foto kendaraan, tarif sewa harian, serta total kuantitas unit fisik yang dimiliki.
+* 🖥️ **Tampilan UI:** Halaman `/admin/cars/add` yang mewah dengan layout multi-input field yang responsif.
+* ⚙️ **Dampak Sistem:** Menyimpan record armada baru ke tabel `cars` dengan inisialisasi default `maintenance_quantity: 0`.
+
+#### **2. Audit e-KYC Instan Melalui Modal**
+* 📍 **Tindakan Admin:** Membuka menu **Customers**, mengklik baris data pengguna untuk membuka baris detail ekspansi, lalu mengklik tombol **Lihat KTP** atau **Lihat Selfie**. Setelah divalidasi keasliannya, admin mengklik tombol **Setujui KYC**.
+* 🖥️ **Tampilan UI:** Direktori data pelanggan interaktif dengan accordion baris, Floating Preview Modal in-app untuk foto dokumen, dan tombol SweetAlert2 untuk verifikasi instan.
+* ⚙️ **Dampak Sistem:** Mengubah nilai kolom `kyc_status` di tabel `users` dari `Pending` menjadi `Approved` secara real-time. Pelanggan kini langsung mendapatkan izin akses untuk melakukan pemesanan mobil di katalog.
+
+#### **3. Verifikasi Transaksi & Approval Dana**
+* 📍 **Tindakan Admin:** Membuka menu **Bookings**, meninjau pesanan masuk berstatus `Awaiting DP Verification`, mengklik detail pesanan, membandingkan kecocokan nilai uang masuk di rekening dengan gambar bukti transfer di modal popup internal, lalu menyetujui DP.
+* 🖥️ **Tampilan UI:** Halaman kelola transaksi `/admin/bookings` yang dilengkapi tab penyaring status (`All`, `Pending`, `Paid`, `Cancelled`), zoom-in modal pratinjau bukti bayar, dan tombol persetujuan cepat.
+* ⚙️ **Dampak Sistem:** Mengubah status transaksi bookings di database dari `Awaiting DP Verification` menjadi `DP Paid` (dan mengubah status booking dari `Awaiting Payment` ke `Ready for Pickup`).
+
+#### **4. Manajemen Pengembalian & Servis Armada (Hold for Maintenance)**
+* 📍 **Tindakan Admin:** Saat pelanggan mengembalikan mobil, jika unit dalam kondisi normal, admin menekan tombol **Selesai Sewa**. Namun, jika unit memerlukan perbaikan/servis berkala, admin menekan tombol **Kembalikan & Hold Perawatan**.
+* 🖥️ **Tampilan UI:** Panel status kontrol booking di halaman kelola pesanan admin dengan tombol aksi pemeliharaan terintegrasi.
+* ⚙️ **Dampak Sistem:** Jika di-hold, sistem meningkatkan nilai kolom `maintenance_quantity` pada tabel `cars` sebanyak jumlah unit yang disewa (`booking.quantity`), memastikan unit tersebut otomatis ditarik dari peredaran katalog publik. Jika servis selesai, admin menekan tombol 🛠 **Selesai Perawatan (1 Unit)** di dashboard Fleet untuk mengurangi `maintenance_quantity` kembali ke stok siap pakai.
 
 ---
 
