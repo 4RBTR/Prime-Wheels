@@ -79,9 +79,9 @@ graph LR
     end
 
     subgraph API_Routes ["API Routes (Backend Serverless)"]
-        API_CUST[/api/customers/kyc]
-        API_BOOK[/api/bookings]
-        API_CARS[/api/cars/maintenance]
+        API_CUST["/api/customers/kyc"]
+        API_BOOK["/api/bookings"]
+        API_CARS["/api/cars/maintenance"]
     end
 
     subgraph Database_Layer ["Database Layer"]
