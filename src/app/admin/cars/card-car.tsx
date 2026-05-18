@@ -15,6 +15,8 @@ export interface CarProps {
   price_per_day: number;
   image_url: string;
   is_available: boolean;
+  quantity: number;
+  maintenance_quantity: number;
 }
 
 export default function CardCar({ car }: { car: CarProps }) {
@@ -60,6 +62,26 @@ export default function CardCar({ car }: { car: CarProps }) {
     }
   };
 
+  const handleRecover = async () => {
+    try {
+      const res = await fetch('/api/cars/maintenance', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ carId: car.id, action: 'RECOVER' })
+      });
+      if (res.ok) {
+        Swal.fire('Sukses', 'Unit berhasil dipulihkan dari perbaikan!', 'success').then(() => {
+          window.location.reload();
+        });
+      } else {
+        const data = await res.json();
+        Swal.fire('Gagal', data.message || 'Gagal memulihkan unit', 'error');
+      }
+    } catch (err) {
+      Swal.fire('Error', 'Terjadi kesalahan server', 'error');
+    }
+  };
+
   return (
     <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group animate-fade-in">
       <div className="relative h-48 w-full bg-slate-50 overflow-hidden">
@@ -73,8 +95,15 @@ export default function CardCar({ car }: { car: CarProps }) {
             className="w-full h-full object-cover relative z-10 transition-transform duration-500 group-hover:scale-105"
           />
         )}
-        <div className={`absolute top-4 right-4 z-20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${car.is_available ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-rose-100 text-rose-700 border border-rose-200'}`}>
-            {car.is_available ? 'Ready' : 'Booked'}
+        <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+           <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white border border-slate-700`}>
+              Total Unit: {car.quantity || 1}
+           </div>
+           {car.maintenance_quantity > 0 && (
+             <div className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 shadow-sm animate-pulse">
+                Maintenance: {car.maintenance_quantity}
+             </div>
+           )}
         </div>
       </div>
       
@@ -105,6 +134,17 @@ export default function CardCar({ car }: { car: CarProps }) {
             Hapus
           </button>
         </div>
+        
+        {car.maintenance_quantity > 0 && (
+          <div className="mt-4 pt-4 border-t border-slate-100">
+            <button 
+              onClick={handleRecover}
+              className="w-full bg-amber-50 text-amber-600 hover:bg-amber-100 py-3 rounded-2xl text-xs font-black transition-colors flex items-center justify-center gap-2 border border-amber-200"
+            >
+              🛠 Selesai Perawatan (1 Unit)
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -17,6 +17,17 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (!status) {
       return NextResponse.json({ message: "Status is required" }, { status: 400 });
     }
+    
+    // Fetch booking quantity
+    const { data: booking, error: fetchErr } = await supabase
+      .from("bookings")
+      .select("quantity")
+      .eq("id", id)
+      .single();
+      
+    if (fetchErr || !booking) {
+      return NextResponse.json({ message: "Booking not found" }, { status: 404 });
+    }
 
     // 1. Update Booking Status
     const { error: updateErr } = await supabase
@@ -28,9 +39,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     // 2. If 'Returned' and setMaintenance is true, hold the car
     if (status === 'Returned' && setMaintenance && carId) {
+      // Get current maintenance quantity
+      const { data: carData } = await supabase.from("cars").select("maintenance_quantity").eq("id", carId).single();
+      const currentMaintenance = carData?.maintenance_quantity || 0;
+      
       const { error: carErr } = await supabase
         .from("cars")
-        .update({ admin_status: 'Maintenance' })
+        .update({ maintenance_quantity: currentMaintenance + (booking.quantity || 1) })
         .eq("id", carId);
         
       if (carErr) throw carErr;

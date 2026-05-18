@@ -18,6 +18,8 @@ export async function POST(req: Request) {
     const startDate = formData.get("startDate") as string;
     const endDate = formData.get("endDate") as string;
     const dpProof = formData.get("dpProof") as File;
+    const quantityParam = formData.get("quantity") as string;
+    const quantity = quantityParam ? parseInt(quantityParam) : 1;
 
     if (!carId || !startDate || !endDate || !dpProof) {
       return NextResponse.json(
@@ -64,8 +66,8 @@ export async function POST(req: Request) {
     if (availErr) {
        console.error("AVAILABILITY ERROR:", availErr);
        // Fallback if RPC fails for some reason
-    } else if (availability <= 0) {
-       return NextResponse.json({ message: "Maaf, unit untuk model ini sudah penuh dipesan pada tanggal tersebut. Silakan pilih tanggal lain atau unit lain." }, { status: 403 });
+    } else if (availability < quantity) {
+       return NextResponse.json({ message: `Maaf, unit yang tersedia untuk tanggal tersebut hanya ${Math.max(0, availability)} unit.` }, { status: 403 });
     }
 
     // Calculate duration & price
@@ -74,9 +76,9 @@ export async function POST(req: Request) {
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
     
-    const rentTotal = car.price_per_day * days;
+    const rentTotal = car.price_per_day * days * quantity;
     const tax = rentTotal * 0.11;
-    const escrow = 100000;
+    const escrow = 100000 * quantity; // Escrow is per car
     const grandTotal = rentTotal + tax + escrow;
     const dpAmount = Math.floor(grandTotal * 0.3);
 
@@ -107,6 +109,7 @@ export async function POST(req: Request) {
           admin_id: car.admin_id,
           start_date: startDate,
           end_date: endDate,
+          quantity: quantity,
           total_price: grandTotal,
           dp_amount: dpAmount,
           payment_dp_url: publicUrlData.publicUrl,

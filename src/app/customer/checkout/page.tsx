@@ -17,6 +17,7 @@ interface CarType {
   price_per_day: number;
   image_url?: string;
   type?: string;
+  quantity?: number;
 }
 
 function CheckoutContent() {
@@ -34,6 +35,7 @@ function CheckoutContent() {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [days, setDays] = useState(1);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -86,9 +88,9 @@ function CheckoutContent() {
   }, [startDate, endDate]);
 
   const carPricePerDay = car?.price_per_day || 0;
-  const rentTotal = carPricePerDay * days;
+  const rentTotal = carPricePerDay * days * quantity;
   const tax = rentTotal * 0.11;
-  const escrow = 100000;
+  const escrow = 100000 * quantity; // Dana titipan per mobil
   const grandTotal = rentTotal + tax + escrow;
   const dpAmount = Math.floor(grandTotal * 0.3);
 
@@ -107,6 +109,7 @@ function CheckoutContent() {
       formData.append("startDate", new Date(startDate).toISOString());
       formData.append("endDate", new Date(endDate).toISOString());
       formData.append("dpProof", dpProof);
+      formData.append("quantity", quantity.toString());
 
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -202,6 +205,29 @@ function CheckoutContent() {
                   onChange={(e) => setEndDate(e.target.value)} 
                 />
               </div>
+              <div className="space-y-2 col-span-1 md:col-span-2 mt-2">
+                <label className="text-xs font-bold text-slate-600 flex items-center gap-1.5 uppercase tracking-wider">
+                  Jumlah Unit (Maks {car?.quantity || 1})
+                </label>
+                <div className="flex items-center gap-4 bg-slate-50 border border-slate-200 rounded-2xl p-2 w-fit">
+                  <button 
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={quantity <= 1 || kycStatus !== 'Approved'}
+                    className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-50 transition-colors"
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center font-black text-lg text-slate-800">{quantity}</span>
+                  <button 
+                    onClick={() => setQuantity(Math.min((car?.quantity || 1), quantity + 1))}
+                    disabled={quantity >= (car?.quantity || 1) || kycStatus !== 'Approved'}
+                    className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-50 transition-colors"
+                  >
+                    +
+                  </button>
+                </div>
+                <p className="text-xs text-slate-500 font-medium mt-2">Catatan: Ketersediaan akhir akan dicek saat checkout berdasarkan tanggal terpilih.</p>
+              </div>
             </div>
           </div>
 
@@ -281,7 +307,7 @@ function CheckoutContent() {
             
             <div className="space-y-3 mb-6 border-b border-slate-100 pb-6">
               <div className="flex justify-between text-sm">
-                <span className="font-semibold text-slate-500">Tarif ({days} Hari)</span>
+                <span className="font-semibold text-slate-500">Tarif ({days} Hari x {quantity} Unit)</span>
                 <span className="font-bold text-slate-900">{formatIDR(rentTotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
