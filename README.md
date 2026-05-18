@@ -171,62 +171,153 @@ Untuk menjaga transparansi pengelolaan armada, sistem kami menggunakan tabel sta
 
 ## 💾 Skema Database & Relasi Tabel
 
-Aplikasi ini menggunakan PostgreSQL di Supabase dengan skema relasional terproteksi RLS (Row Level Security):
+Aplikasi ini menggunakan basis data relasional PostgreSQL (Supabase) dengan proteksi keamanan **RLS (Row Level Security)**. Di bawah ini adalah struktur relasi tabel dan detail kolom yang dirancang agar sangat mudah dipahami.
 
-### **1. Tabel `users` (Data Pengguna & Status KYC)**
-Menyimpan informasi identitas, kredensial terenkripsi, hak akses, serta tautan dokumen e-KYC.
+### 1. Diagram Relasi Entitas (Entity-Relationship Diagram)
+Diagram Mermaid di bawah ini menggambarkan bagaimana tabel-tabel utama saling terhubung melalui relasi kunci asing (*Foreign Keys*):
+
+```mermaid
+erDiagram
+    users {
+        uuid id PK "Primary Key (Auto UUID)"
+        string name "Nama Pengguna"
+        string email UK "Email Unik"
+        string password "Password Terenkripsi Bcrypt"
+        string role "Akses: ADMIN / USER"
+        string ktp_url "Tautan File Gambar KTP"
+        string selfie_url "Tautan File Gambar Selfie"
+        string kyc_status "Status: Approved/Rejected/Pending"
+        timestamp created_at "Tanggal Registrasi"
+    }
+    cars {
+        uuid id PK "Primary Key (Auto UUID)"
+        string brand "Merek Mobil (e.g. BMW)"
+        string name "Nama Tipe Mobil (e.g. X7)"
+        string type "Kategori (e.g. SUV)"
+        numeric price_per_day "Tarif Sewa Harian"
+        integer quantity "Stok Total Armada Fisik"
+        integer maintenance_quantity "Jumlah Unit Sedang Diservis"
+        string image_url "Tautan Gambar Kendaraan"
+        timestamp created_at "Tanggal Ditambahkan"
+    }
+    bookings {
+        uuid id PK "Primary Key (Auto UUID)"
+        string booking_code UK "Kode Unik Sewa (RNT-...)"
+        uuid user_id FK "Relasi ke users(id)"
+        uuid car_id FK "Relasi ke cars(id)"
+        date start_date "Tanggal Awal Sewa"
+        date end_date "Tanggal Akhir Sewa"
+        integer quantity "Jumlah Unit Dipesan"
+        numeric total_price "Total Nominal Transaksi"
+        string status "Status Sewa"
+        string payment_status "Status Pembayaran"
+        string payment_dp_url "Tautan Bukti Transfer DP"
+        string payment_full_url "Tautan Bukti Transfer Pelunasan"
+        timestamp created_at "Tanggal Transaksi Dibuat"
+    }
+    users ||--o{ bookings : "melakukan pemesanan"
+    cars ||--o{ bookings : "disewa dalam"
+```
+
+---
+
+### 2. Deskripsi Kolom & Kamus Data (Data Dictionary)
+
+#### A. Tabel `users` (Manajemen Identitas & e-KYC)
+| Nama Kolom | Tipe Data | Atribut | Deskripsi / Penjelasan |
+| :--- | :--- | :--- | :--- |
+| **`id`** | `UUID` | **PK**, Default | ID unik otomatis untuk setiap akun pengguna. |
+| **`name`** | `TEXT` | `NOT NULL` | Nama lengkap asli sesuai dengan KTP. |
+| **`email`** | `TEXT` | `UNIQUE` | Alamat email aktif untuk akses login. |
+| **`password`** | `TEXT` | `NOT NULL` | Kredensial kata sandi yang telah di-hash menggunakan Bcrypt. |
+| **`role`** | `TEXT` | `USER` / `ADMIN` | Menentukan hak akses halaman dasbor. |
+| **`ktp_url`** | `TEXT` | *Nullable* | Tautan penyimpanan cloud untuk foto dokumen KTP pengguna. |
+| **`selfie_url`** | `TEXT` | *Nullable* | Tautan penyimpanan cloud untuk foto selfie wajah pengguna. |
+| **`kyc_status`** | `TEXT` | Default: `Pending` | Status verifikasi e-KYC (`Pending`, `Approved`, `Rejected`). |
+
+#### B. Tabel `cars` (Inventaris Armada & Stok)
+| Nama Kolom | Tipe Data | Atribut | Deskripsi / Penjelasan |
+| :--- | :--- | :--- | :--- |
+| **`id`** | `UUID` | **PK**, Default | ID unik otomatis untuk model/armada mobil. |
+| **`brand`** | `TEXT` | `NOT NULL` | Produsen/Merek pabrikan mobil (misalnya: Mercedes-Benz, BMW). |
+| **`name`** | `TEXT` | `NOT NULL` | Nama seri/tipe kendaraan mewah (misalnya: S-Class, X7). |
+| **`type`** | `TEXT` | `NOT NULL` | Kategori tipe bodi mobil (misalnya: Sedan, SUV, Sports). |
+| **`price_per_day`** | `NUMERIC` | `NOT NULL` | Tarif dasar sewa per unit per 24 jam. |
+| **`quantity`** | `INTEGER` | Default: `1` | Jumlah total unit fisik yang dimiliki oleh kantor rental. |
+| **`maintenance_quantity`** | `INTEGER` | Default: `0` | Jumlah unit fisik yang saat ini sedang berada di bengkel perawatan. |
+
+#### C. Tabel `bookings` (Transaksi, Operasional & Bukti Transfer)
+| Nama Kolom | Tipe Data | Atribut | Deskripsi / Penjelasan |
+| :--- | :--- | :--- | :--- |
+| **`id`** | `UUID` | **PK**, Default | ID transaksi penyewaan mobil. |
+| **`booking_code`** | `TEXT` | **UK**, `NOT NULL` | Kode pesanan acak berformat premium, contoh: `RNT-A2BC9`. |
+| **`user_id`** | `UUID` | **FK** | Terhubung ke `users.id` (Relasi Cascade). |
+| **`car_id`** | `UUID` | **FK** | Terhubung ke `cars.id` (Relasi Cascade). |
+| **`start_date`** | `DATE` | `NOT NULL` | Hari pertama serah terima dan masa aktif rental. |
+| **`end_date`** | `DATE` | `NOT NULL` | Hari terakhir dan pengembalian unit mobil sewa. |
+| **`quantity`** | `INTEGER` | Default: `1` | Jumlah unit dari mobil tersebut yang disewa sekaligus. |
+| **`total_price`** | `NUMERIC` | `NOT NULL` | Nominal akhir biaya sewa (sudah termasuk hitungan kuantitas & durasi). |
+| **`status`** | `TEXT` | Default: `Awaiting...` | Status operasional unit (`Awaiting Payment`, `Ready...`, `On Road`, `Returned`). |
+| **`payment_status`** | `TEXT` | Default: `Pending` | Status aliran verifikasi dana (`Pending`, `Awaiting DP...`, `DP Paid`, `Paid`). |
+
+---
+
+### 3. DDL SQL Lengkap (Raw SQL Schema) & Fungsi Database
+
+Untuk memudahkan instalasi tabel-tabel di atas langsung pada console database Supabase/PostgreSQL Anda, silakan ekspansi menu di bawah ini:
+
+<details>
+<summary><b>👉 KLIK UNTUK MELIHAT SOURCE CODE DDL SQL TABEL</b></summary>
+
 ```sql
+-- Buat Tabel Users
 CREATE TABLE public.users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'USER', -- 'USER' atau 'ADMIN'
-    ktp_url TEXT,                     -- Tautan penyimpanan awan foto KTP
-    selfie_url TEXT,                  -- Tautan penyimpanan awan foto selfie
-    kyc_status TEXT DEFAULT 'Pending',-- 'Pending', 'Approved', 'Rejected'
+    role TEXT NOT NULL DEFAULT 'USER',
+    ktp_url TEXT,
+    selfie_url TEXT,
+    kyc_status TEXT DEFAULT 'Pending',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
-```
 
-### **2. Tabel `cars` (Inventaris Armada & Ketersediaan)**
-Melacak tipe mobil, tarif sewa, stok total, serta stok yang sedang berada di unit perawatan (maintenance).
-```sql
+-- Buat Tabel Cars
 CREATE TABLE public.cars (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    brand TEXT NOT NULL,               -- Contoh: 'BMW'
-    name TEXT NOT NULL,                -- Contoh: 'X7'
-    type TEXT NOT NULL,                -- Contoh: 'SUV'
+    brand TEXT NOT NULL,
+    name TEXT NOT NULL,
+    type TEXT NOT NULL,
     price_per_day NUMERIC NOT NULL,
     quantity INTEGER NOT NULL DEFAULT 1,
-    maintenance_quantity INTEGER NOT NULL DEFAULT 0, -- Unit yang sedang diservis
+    maintenance_quantity INTEGER NOT NULL DEFAULT 0,
     image_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
-```
 
-### **3. Tabel `bookings` (Transaksi & Operasional)**
-Melacak siklus hidup penyewaan mobil, nominal biaya, status pengiriman unit sewa, dan data verifikasi transfer pembayaran.
-```sql
+-- Buat Tabel Bookings
 CREATE TABLE public.bookings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    booking_code TEXT UNIQUE NOT NULL, -- Kode unik sewa, contoh: 'RNT-...'
+    booking_code TEXT UNIQUE NOT NULL,
     user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
     car_id UUID REFERENCES public.cars(id) ON DELETE CASCADE,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
-    quantity INTEGER NOT NULL DEFAULT 1, -- Jumlah unit mobil yang disewa
+    quantity INTEGER NOT NULL DEFAULT 1,
     total_price NUMERIC NOT NULL,
-    status TEXT NOT NULL DEFAULT 'Awaiting Payment', -- 'Awaiting Payment', 'Ready for Pickup', 'On Road', 'Returned', 'Cancelled'
-    payment_status TEXT NOT NULL DEFAULT 'Pending',  -- 'Pending', 'Awaiting DP Verification', 'DP Paid', 'Awaiting Full Payment Verification', 'Paid'
-    payment_dp_url TEXT,                -- Tautan bukti transfer DP
-    payment_full_url TEXT,              -- Tautan bukti transfer pelunasan
+    status TEXT NOT NULL DEFAULT 'Awaiting Payment',
+    payment_status TEXT NOT NULL DEFAULT 'Pending',
+    payment_dp_url TEXT,
+    payment_full_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 ```
+</details>
 
-### **4. Fungsi RPC Database `check_car_availability`**
-Digunakan untuk mengecek sisa ketersediaan unit mobil yang bebas untuk disewa pada rentang tanggal tertentu guna menghindari double booking (*race condition*).
+<details>
+<summary><b>👉 KLIK UNTUK MELIHAT SOURCE CODE DOKUMENTASI RPC FUNCTION check_car_availability</b></summary>
+
 ```sql
 CREATE OR REPLACE FUNCTION check_car_availability(
     target_car_id UUID,
@@ -260,6 +351,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 ```
+</details>
 
 ---
 
