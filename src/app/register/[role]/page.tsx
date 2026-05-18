@@ -19,6 +19,7 @@ export default function RegistrationForm() {
     name: "",
     email: "",
     password: "",
+    city: "Surabaya",
   });
   const [ktpFile, setKtpFile] = useState<File | null>(null);
   const [selfieFile, setSelfieFile] = useState<File | null>(null);
@@ -43,6 +44,7 @@ export default function RegistrationForm() {
     submitData.append("email", formData.email);
     submitData.append("password", formData.password);
     submitData.append("role", role);
+    submitData.append("city", formData.city);
     if (ktpFile) submitData.append("ktp", ktpFile);
     if (selfieFile) submitData.append("selfie", selfieFile);
 
@@ -173,6 +175,27 @@ export default function RegistrationForm() {
                 onChange={handleChange}
                 required
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-500 tracking-wider mb-2 uppercase">
+                Pilih Kota/Wilayah
+              </label>
+              <select
+                name="city"
+                className="w-full p-3.5 bg-slate-100 text-slate-900 rounded-xl border-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all outline-none font-medium appearance-none"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                required
+              >
+                <option value="Surabaya">Surabaya</option>
+                <option value="Jakarta">Jakarta</option>
+                <option value="Bandung">Bandung</option>
+                <option value="Semarang">Semarang</option>
+                <option value="Yogyakarta">Yogyakarta</option>
+                <option value="Bali">Bali</option>
+                <option value="Medan">Medan</option>
+              </select>
             </div>
 
             {/* e-KYC exclusively for Users */}

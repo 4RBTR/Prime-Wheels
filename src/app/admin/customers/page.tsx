@@ -11,6 +11,7 @@ export interface CustomerType {
   email: string;
   ktp_url: string | null;
   selfie_url: string | null;
+  kyc_status: string;
   created_at: string;
 }
 
@@ -34,8 +35,8 @@ export default function CustomersPage() {
   }, []);
 
   const getKycStatus = (c: CustomerType) => {
-    if (c.ktp_url && c.selfie_url) return "Verified";
-    if (c.ktp_url || c.selfie_url) return "Pending";
+    if (c.kyc_status === "Approved") return "Verified";
+    if (c.kyc_status === "Pending" && (c.ktp_url || c.selfie_url)) return "Pending";
     return "None";
   };
 

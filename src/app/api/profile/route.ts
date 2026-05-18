@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { supabase } from "@/lib/supabase";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
@@ -20,8 +20,9 @@ export async function GET(req: Request) {
     if (error) throw error;
 
     return NextResponse.json({ user }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
@@ -37,7 +38,7 @@ export async function PUT(req: Request) {
     const name = formData.get("name") as string;
     const profilePhoto = formData.get("profilePhoto") as File;
 
-    const updates: any = {};
+    const updates: Record<string, unknown> = {};
     if (name) updates.name = name;
 
     if (profilePhoto) {
@@ -46,11 +47,11 @@ export async function PUT(req: Request) {
       const fileExt = profilePhoto.name.split('.').pop();
       const fileName = `${session.user.id}-${Date.now()}-profile.${fileExt}`;
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("prime") // Reusing prime bucket for profile photos too, or create a users bucket. prime is fine.
         .upload(fileName, buffer, {
           contentType: profilePhoto.type,
-          upsert: true,
+          upsert: false,
         });
 
       if (uploadError) throw uploadError;
@@ -76,7 +77,8 @@ export async function PUT(req: Request) {
     }
 
     return NextResponse.json({ message: "No updates provided" }, { status: 400 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

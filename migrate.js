@@ -13,7 +13,7 @@ async function runMigration() {
     await client.connect();
     console.log('Connected to Supabase PostgreSQL database.');
 
-    const sqlFilePath = path.join(process.cwd(), 'supabase', 'migrations', '005_fleet_management.sql');
+    const sqlFilePath = path.join(process.cwd(), 'supabase', 'migrations', '006_regional_chat_system.sql');
     const sql = fs.readFileSync(sqlFilePath, 'utf-8');
 
     console.log('Executing migration...');

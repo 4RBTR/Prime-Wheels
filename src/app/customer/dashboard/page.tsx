@@ -4,18 +4,29 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 export default function CustomerDashboard() {
+  const { data: session } = useSession();
   const [cars, setCars] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [categories, setCategories] = useState<string[]>(["All"]);
+  const [selectedCity, setSelectedCity] = useState<string>("");
+
+  useEffect(() => {
+    if (session?.user && !selectedCity) {
+      setSelectedCity((session.user as any).city || "Surabaya");
+    }
+  }, [session, selectedCity]);
 
   useEffect(() => {
     async function fetchCars() {
+      if (!selectedCity) return;
+      setLoading(true);
       try {
-        const res = await fetch("/api/cars");
+        const res = await fetch(`/api/cars?city=${selectedCity}`);
         const data = await res.json();
         if (res.ok && data.cars) {
           setCars(data.cars);
@@ -34,7 +45,7 @@ export default function CustomerDashboard() {
       }
     }
     fetchCars();
-  }, []);
+  }, [selectedCity]);
 
   const filteredCars = activeFilter === "All" 
     ? cars 
@@ -50,14 +61,37 @@ export default function CustomerDashboard() {
 
   return (
     <div>
-      <div className="mb-10 text-center md:text-left relative">
-        <div className="absolute top-[-30px] left-[-40px] w-72 h-72 bg-amber-400/10 rounded-full blur-3xl pointer-events-none"></div>
-        <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4 relative z-10">
-          Find Your Perfect Drive
-        </h1>
-        <p className="text-lg text-slate-500 max-w-2xl relative z-10">
-          Explore our premium collection of luxury vehicles. Ready for your business trip or weekend getaway.
-        </p>
+      <div className="mb-10 text-center md:text-left relative flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div>
+          <div className="absolute top-[-30px] left-[-40px] w-72 h-72 bg-amber-400/10 rounded-full blur-3xl pointer-events-none"></div>
+          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4 relative z-10">
+            Find Your Perfect Drive
+          </h1>
+          <p className="text-lg text-slate-500 max-w-2xl relative z-10">
+            Explore our premium collection of luxury vehicles in your selected city.
+          </p>
+        </div>
+        
+        {/* City Selector */}
+        <div className="mt-6 md:mt-0 relative z-10 flex items-center bg-white border border-slate-200 rounded-2xl px-4 py-2 shadow-sm">
+          <MapPin className="w-5 h-5 text-blue-600 mr-3" />
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Lokasi Sewa</span>
+            <select
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className="bg-transparent text-sm font-bold text-slate-900 outline-none appearance-none cursor-pointer"
+            >
+              <option value="Surabaya">Surabaya</option>
+              <option value="Jakarta">Jakarta</option>
+              <option value="Bandung">Bandung</option>
+              <option value="Semarang">Semarang</option>
+              <option value="Yogyakarta">Yogyakarta</option>
+              <option value="Bali">Bali</option>
+              <option value="Medan">Medan</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Filter Section */}

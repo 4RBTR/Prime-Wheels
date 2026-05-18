@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     // Get all users with role USER
     const { data: customers, error } = await supabase
       .from("users")
-      .select("id, name, email, role, ktp_url, selfie_url, profile_photo_url, created_at")
+      .select("id, name, email, role, ktp_url, selfie_url, profile_photo_url, created_at, kyc_status")
       .eq("role", "USER")
       .order("created_at", { ascending: false });
 

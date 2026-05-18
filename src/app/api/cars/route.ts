@@ -8,6 +8,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const adminId = searchParams.get("adminId");
     const id = searchParams.get("id");
+    const city = searchParams.get("city");
 
     if (id) {
       const { data: car, error } = await supabase
@@ -20,7 +21,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ car }, { status: 200 });
     }
 
-    let query = supabase.from("cars").select("*").order("created_at", { ascending: false });
+    let query = supabase.from("cars").select("*, admin:users(city)").order("created_at", { ascending: false });
 
     if (adminId) {
       query = query.eq("admin_id", adminId);
@@ -28,13 +29,31 @@ export async function GET(req: Request) {
       query = query.eq("admin_status", "Available"); // Only show Available units for public/customer
     }
 
+    if (city) {
+      // Find the admin for this city
+      const { data: admin } = await supabase
+        .from("users")
+        .select("id")
+        .eq("role", "ADMIN")
+        .eq("city", city)
+        .maybeSingle();
+        
+      if (admin) {
+        query = query.eq("admin_id", admin.id);
+      } else {
+        // No admin for this city, return empty
+        return NextResponse.json({ cars: [] }, { status: 200 });
+      }
+    }
+
     const { data: cars, error } = await query;
 
     if (error) throw error;
 
     return NextResponse.json({ cars }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
@@ -69,11 +88,11 @@ export async function POST(req: Request) {
       const fileExt = imageFile.name.split('.').pop();
       const fileName = `${session.user.id}-${Date.now()}.${fileExt}`;
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("cars")
         .upload(fileName, buffer, {
           contentType: imageFile.type,
-          upsert: true,
+          upsert: false,
         });
 
       if (uploadError) throw uploadError;
@@ -108,8 +127,9 @@ export async function POST(req: Request) {
     if (error) throw error;
 
     return NextResponse.json({ message: "Car added successfully", car: data }, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
@@ -138,7 +158,7 @@ export async function PATCH(req: Request) {
     }
 
     // Prepare update data
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       name,
       brand,
       type,
@@ -160,7 +180,7 @@ export async function PATCH(req: Request) {
         .from("cars")
         .upload(fileName, buffer, {
           contentType: imageFile.type,
-          upsert: true,
+          upsert: false,
         });
 
       if (uploadError) throw uploadError;
@@ -183,8 +203,9 @@ export async function PATCH(req: Request) {
     if (error) throw error;
 
     return NextResponse.json({ message: "Car updated successfully", car: data }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
@@ -212,7 +233,8 @@ export async function DELETE(req: Request) {
     if (error) throw error;
 
     return NextResponse.json({ message: "Car deleted successfully" }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

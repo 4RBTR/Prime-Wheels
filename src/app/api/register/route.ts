@@ -10,13 +10,14 @@ export async function POST(req: Request) {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const roleParam = formData.get("role") as string;
+    const city = formData.get("city") as string;
     
     // e-KYC files
     const ktpFile = formData.get("ktp") as File | null;
     const selfieFile = formData.get("selfie") as File | null;
 
-    if (!name || !email || !password || !roleParam) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!name || !email || !password || !roleParam || !city) {
+      return NextResponse.json({ error: "Missing required fields (including city)" }, { status: 400 });
     }
 
     const role = roleParam.toUpperCase();
@@ -33,6 +34,19 @@ export async function POST(req: Request) {
 
     if (existingUser) {
       return NextResponse.json({ error: "Email already in use" }, { status: 400 });
+    }
+
+    if (role === "ADMIN") {
+      const { data: existingAdmin } = await supabase
+        .from("users")
+        .select("id")
+        .eq("role", "ADMIN")
+        .eq("city", city)
+        .maybeSingle();
+
+      if (existingAdmin) {
+        return NextResponse.json({ error: `Admin untuk kota ${city} sudah terdaftar. Hanya 1 admin per kota yang diizinkan.` }, { status: 400 });
+      }
     }
 
     const password_hash = await bcrypt.hash(password, 10);
@@ -77,6 +91,7 @@ export async function POST(req: Request) {
           email,
           password_hash,
           role,
+          city,
           ktp_url,
           selfie_url,
         }

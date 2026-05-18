@@ -40,6 +40,11 @@ const Icons = {
       <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" />
     </svg>
   ),
+  Chat: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  ),
   SignOut: (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" x2="9" y1="12" y2="12" />
@@ -66,6 +71,7 @@ export default function AdminNavbar({ children }: { children?: React.ReactNode }
     { name: "Finance", path: "/admin/transactions", icon: Icons.Finance },
     { name: "Fleet", path: "/admin/cars", icon: Icons.Fleet },
     { name: "Customers", path: "/admin/customers", icon: Icons.Members },
+    { name: "Messages", path: "/admin/chat", icon: Icons.Chat },
     { name: "Settings", path: "/admin/profile", icon: Icons.Settings },
   ];
 
@@ -78,23 +84,23 @@ export default function AdminNavbar({ children }: { children?: React.ReactNode }
           <div className="flex justify-between items-center h-16">
 
             {/* Left: Brand & Navigation */}
-            <div className="flex items-center gap-8">
-              <div className="shrink-0 flex items-center gap-2 mr-4">
+            <div className="flex items-center gap-4 xl:gap-8">
+              <div className="shrink-0 flex items-center gap-2 mr-2">
                 <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/20">
                   <span className="text-white font-black text-sm">R</span>
                 </div>
-                <span className="font-extrabold text-lg text-slate-900 tracking-tight">Prime Wheels</span>
+                <span className="font-extrabold text-lg text-slate-900 tracking-tight hidden sm:block">Prime Wheels</span>
               </div>
 
               {/* Desktop Links */}
-              <nav className="hidden md:flex items-center space-x-2">
+              <nav className="hidden lg:flex items-center space-x-1">
                 {navItems.map((item) => {
                   const active = isActive(item.path);
                   return (
                     <Link
                       key={item.path}
                       href={item.path}
-                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2
+                      className={`px-3 py-2 rounded-full text-[13px] font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0
                           ${active ? 'bg-blue-600 text-white shadow-md shadow-blue-600/10' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}
                        `}
                     >
@@ -107,9 +113,9 @@ export default function AdminNavbar({ children }: { children?: React.ReactNode }
             </div>
 
             {/* Right: Actions */}
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-3">
               {/* Quick Create Button */}
-              <Link href="/admin/bookings" className="text-sm font-bold bg-white border border-slate-200 text-slate-900 px-4 py-2 rounded-full hover:bg-slate-50 transition-all shadow-sm">
+              <Link href="/admin/bookings" className="text-sm font-bold bg-white border border-slate-200 text-slate-900 px-4 py-2 rounded-full hover:bg-slate-50 transition-all shadow-sm whitespace-nowrap shrink-0">
                 + New Booking
               </Link>
 
