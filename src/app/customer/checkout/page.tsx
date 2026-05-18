@@ -246,7 +246,7 @@ function CheckoutContent() {
               <div className="text-center md:text-left space-y-2">
                 <h3 className="text-lg font-bold text-slate-900">Scan QRIS Prime Wheels</h3>
                 <p className="text-slate-600 text-sm">Gunakan aplikasi M-Banking atau e-Wallet kesayangan Anda untuk membayar.</p>
-                <div className="bg-white inline-block px-4 py-2 border border-blue-200 bg-blue-50 text-blue-700 rounded-lg font-black text-lg">
+                <div className="bg-white inline-block px-4 py-2 border border-blue-200 text-blue-700 rounded-lg font-black text-lg">
                   Nominal DP: {formatIDR(dpAmount)}
                 </div>
               </div>
