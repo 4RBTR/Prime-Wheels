@@ -395,40 +395,148 @@ Buka browser Anda di tautan [**http://localhost:3000**](http://localhost:3000).
 
 ## 🔌 Dokumentasi API Endpoints
 
-Semua endpoint API terletak di direktori `/api/` dan dilindungi dengan verifikasi token NextAuth.
+Seluruh API Endpoint yang dibangun pada Prime Wheels menggunakan rute serverless **Next.js Route Handlers** (terletak di direktori `/api/`). Setiap endpoint dilindungi oleh sistem keamanan sesi **NextAuth.js** dan memerlukan verifikasi JSON Web Token (JWT) dengan skema otorisasi berbasis peran (*role-based authorization*).
 
-### **1. e-KYC & Pelanggan**
-* **`GET /api/customers`**
-  * **Hak Akses:** `ADMIN`
-  * **Deskripsi:** Mengambil daftar semua pengguna terdaftar yang bertipe `USER` beserta detail kelengkapan data KYC mereka.
-  * **Respon Sukses (200):** `{ customers: [...] }`
-  
-* **`PUT /api/customers/kyc`**
-  * **Hak Akses:** `ADMIN`
-  * **Deskripsi:** Memperbarui status e-KYC pengguna menjadi disetujui atau ditolak.
-  * **Body Request:** `{ userId: "UUID", status: "Approved" | "Rejected" }`
-  * **Respon Sukses (200):** `{ message: "Status KYC berhasil diperbarui" }`
+### 1. Katalog API (API Unified Catalog)
 
-### **2. Pemesanan & Sewa**
-* **`GET /api/bookings`**
-  * **Hak Akses:** `USER` (untuk mengambil booking miliknya sendiri) & `ADMIN` (mengambil seluruh booking yang berhubungan dengan armadanya).
-  * **Deskripsi:** Menarik riwayat pemesanan mobil real-time.
-  
-* **`PUT /api/bookings/[id]/approve-payment`**
-  * **Hak Akses:** `ADMIN`
-  * **Deskripsi:** Memverifikasi pembayaran uang muka (DP) atau pelunasan dari penyewa setelah admin memvalidasi keaslian dokumen transfer melalui popup modal.
-  * **Body Request:** `{ action: "APPROVE_DP" | "REJECT_DP" | "APPROVE_FULL" | "REJECT_FULL" }`
+| Method | Endpoint | Hak Akses | Deskripsi Utama |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/customers` | `ADMIN` | Mengambil daftar seluruh penyewa (`USER`) dan data KYC. |
+| `PUT` | `/api/customers/kyc` | `ADMIN` | Memverifikasi (Approve/Reject) status e-KYC pelanggan. |
+| `GET` | `/api/bookings` | `USER` / `ADMIN` | Mengambil riwayat transaksi sewa (Filter otomatis sesuai role). |
+| `PUT` | `/api/bookings/[id]/approve-payment` | `ADMIN` | Memverifikasi sah/tidaknya transfer dana DP atau pelunasan. |
+| `PUT` | `/api/bookings/[id]/status` | `ADMIN` | Mengubah siklus operasional armada (`On Road`, `Returned`, dll). |
+| `PUT` | `/api/cars/maintenance` | `ADMIN` | Memulihkan stok mobil dari unit pemeliharaan kembali siap sewa. |
 
-* **`PUT /api/bookings/[id]/status`**
-  * **Hak Akses:** `ADMIN`
-  * **Deskripsi:** Mengubah siklus hidup operasional pesanan. Bila kendaraan dikonfirmasi kembali dengan opsi hold, sistem secara otomatis meningkatkan `maintenance_quantity` pada model mobil tersebut.
-  * **Body Request:** `{ status: "On Road" | "Returned" | "Cancelled", carId?: "UUID", setMaintenance?: true | false }`
+---
 
-### **3. Inventaris & Armada**
-* **`PUT /api/cars/maintenance`**
-  * **Hak Akses:** `ADMIN`
-  * **Deskripsi:** Memulihkan unit yang sedang diservis secara bertahap (per 1 unit mobil).
-  * **Body Request:** `{ carId: "UUID" }`
+### 2. Penjelasan Detail Payload & Skema JSON
+
+#### 📁 A. e-KYC & Manajemen Pelanggan
+
+##### **1. GET /api/customers**
+* **Headers:** `Content-Type: application/json`
+* **Response Sukses (200 OK):**
+  ```json
+  {
+    "customers": [
+      {
+        "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+        "name": "Rian Hidayat",
+        "email": "rian.hidayat@example.com",
+        "role": "USER",
+        "ktp_url": "https://supabase-storage.com/kyc/ktp_123.jpg",
+        "selfie_url": "https://supabase-storage.com/kyc/selfie_123.jpg",
+        "kyc_status": "Pending",
+        "created_at": "2026-05-18T10:00:00.000Z"
+      }
+    ]
+  }
+  ```
+
+##### **2. PUT /api/customers/kyc**
+* **Headers:** `Content-Type: application/json`
+* **Request Body JSON:**
+  ```json
+  {
+    "userId": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+    "status": "Approved" // Nilai valid: "Approved" | "Rejected"
+  }
+  ```
+* **Response Sukses (200 OK):**
+  ```json
+  {
+    "message": "Status KYC berhasil diperbarui menjadi Approved"
+  }
+  ```
+* **Response Error (400 Bad Request):**
+  ```json
+  {
+    "error": "Kolom userId dan status wajib diisi dengan benar"
+  }
+  ```
+
+---
+
+#### 📁 B. Pemesanan, Sewa & Alur Finansial
+
+##### **1. GET /api/bookings**
+* **Filter Role:** Jika diakses oleh `USER`, hanya mengembalikan transaksi miliknya. Jika diakses oleh `ADMIN`, mengembalikan semua transaksi sewa di platform.
+* **Response Sukses (200 OK):**
+  ```json
+  {
+    "bookings": [
+      {
+        "id": "b9f9e9d9-c9b9-a9a9-9999-888888888888",
+        "booking_code": "RNT-X7K89",
+        "start_date": "2026-06-01",
+        "end_date": "2026-06-05",
+        "quantity": 1,
+        "total_price": 4500000,
+        "status": "Ready for Pickup",
+        "payment_status": "DP Paid",
+        "car": {
+          "brand": "BMW",
+          "name": "X7"
+        }
+      }
+    ]
+  }
+  ```
+
+##### **2. PUT /api/bookings/[id]/approve-payment**
+* **Request Body JSON:**
+  ```json
+  {
+    "action": "APPROVE_DP" // Nilai valid: "APPROVE_DP" | "REJECT_DP" | "APPROVE_FULL" | "REJECT_FULL"
+  }
+  ```
+* **Response Sukses (200 OK):**
+  ```json
+  {
+    "message": "Pembayaran DP berhasil diverifikasi. Status pembayaran diperbarui menjadi DP Paid."
+  }
+  ```
+
+##### **3. PUT /api/bookings/[id]/status**
+* **Request Body JSON:**
+  ```json
+  {
+    "status": "Returned", // Nilai valid: "On Road" | "Returned" | "Cancelled"
+    "carId": "c8d8e8f8-a8b8-c8d8-e8f8-a8b8c8d8e8f8",
+    "setMaintenance": true // Set true jika mobil kembali dalam kondisi rusak/perlu servis
+  }
+  ```
+* **Response Sukses (200 OK):**
+  ```json
+  {
+    "message": "Status sewa berhasil diubah. Unit mobil dipindahkan ke status pemeliharaan berkala."
+  }
+  ```
+
+---
+
+#### 📁 C. Pemeliharaan Armada (Fleet Maintenance)
+
+##### **1. PUT /api/cars/maintenance**
+* **Request Body JSON:**
+  ```json
+  {
+    "carId": "c8d8e8f8-a8b8-c8d8-e8f8-a8b8c8d8e8f8"
+  }
+  ```
+* **Response Sukses (200 OK):**
+  ```json
+  {
+    "message": "Satu unit armada mobil berhasil diselesaikan dari masa perawatan berkala dan siap disewa kembali."
+  }
+  ```
+* **Response Error (404 Not Found):**
+  ```json
+  {
+    "error": "Mobil tidak ditemukan atau unit perawatan sudah bernilai 0"
+  }
+  ```
 
 ---
 
