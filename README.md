@@ -67,24 +67,24 @@ Diagram di bawah ini menunjukkan interaksi antara antarmuka pengguna (Frontend),
 
 ```mermaid
 graph LR
-    subgraph Client Viewport
+    subgraph Client_Viewport ["Client Viewport"]
         FE[React 19 / Next.js 16 UI]
         COMP[HTML5 Canvas Compressor]
         MOD[In-App Document Modals]
     end
 
-    subgraph Authentication & Protection
+    subgraph Auth_Protection ["Authentication & Protection"]
         AUTH[NextAuth.js JWT Session]
         GUARD[Next.js Middleware Guards]
     end
 
-    subgraph API Routes (Backend Serverless)
+    subgraph API_Routes ["API Routes (Backend Serverless)"]
         API_CUST[/api/customers/kyc]
         API_BOOK[/api/bookings]
         API_CARS[/api/cars/maintenance]
     end
 
-    subgraph Database Layer
+    subgraph Database_Layer ["Database Layer"]
         DB[(Supabase PostgreSQL)]
         RPC[check_car_availability RPC]
     end
