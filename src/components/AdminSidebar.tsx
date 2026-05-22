@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -62,6 +62,17 @@ export default function AdminNavbar({ children }: { children?: React.ReactNode }
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
+
   const isActive = (path: string) => pathname?.startsWith(path);
 
   const navItems = [
@@ -78,21 +89,21 @@ export default function AdminNavbar({ children }: { children?: React.ReactNode }
   return (
     <div className="min-h-screen bg-[#F7F7F9] flex flex-col font-sans text-slate-900">
 
-      {/* Apple-style Crisp Light Navbar */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-xl">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 md:px-8">
-          <div className="flex justify-between items-center h-16">
+      {/* Premium Glassmorphism Navbar */}
+      <header className="sticky top-0 z-40 w-full border-b border-slate-200/60 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-[72px]">
 
             {/* Left: Brand & Navigation */}
-            <div className="flex items-center gap-4 xl:gap-8">
-              <div className="shrink-0 flex items-center gap-2 mr-2">
-                <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/20">
-                  <span className="text-white font-black text-sm">R</span>
+            <div className="flex items-center gap-6 xl:gap-8">
+              <Link href="/admin/dashboard" className="shrink-0 flex items-center gap-2 group">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-300">
+                  <span className="text-white font-black text-lg">P</span>
                 </div>
-                <span className="font-extrabold text-lg text-slate-900 tracking-tight hidden sm:block">Prime Wheels</span>
-              </div>
+                <span className="font-extrabold text-xl text-slate-900 tracking-tight hidden md:block group-hover:text-blue-600 transition-colors">Prime</span>
+              </Link>
 
-              {/* Desktop Links */}
+              {/* Desktop Links (1024px and up) */}
               <nav className="hidden lg:flex items-center space-x-1">
                 {navItems.map((item) => {
                   const active = isActive(item.path);
@@ -100,8 +111,8 @@ export default function AdminNavbar({ children }: { children?: React.ReactNode }
                     <Link
                       key={item.path}
                       href={item.path}
-                      className={`px-3 py-2 rounded-full text-[13px] font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0
-                          ${active ? 'bg-blue-600 text-white shadow-md shadow-blue-600/10' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}
+                      className={`px-3.5 py-2 rounded-full text-[13px] font-bold transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0
+                          ${active ? 'bg-blue-600 text-white shadow-md shadow-blue-600/10 scale-105' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}
                        `}
                     >
                       <span className={active ? 'text-white' : 'text-slate-400'}>{item.icon}</span>
@@ -113,68 +124,132 @@ export default function AdminNavbar({ children }: { children?: React.ReactNode }
             </div>
 
             {/* Right: Actions */}
-            <div className="hidden md:flex items-center gap-3">
-              {/* Quick Create Button */}
-              <Link href="/admin/bookings" className="text-sm font-bold bg-white border border-slate-200 text-slate-900 px-4 py-2 rounded-full hover:bg-slate-50 transition-all shadow-sm whitespace-nowrap shrink-0">
+            <div className="flex items-center gap-3">
+              {/* Quick Create Button (Hidden on very small screens) */}
+              <Link href="/admin/bookings" className="hidden sm:flex items-center gap-2 text-sm font-bold bg-white border border-slate-200 text-slate-900 px-5 py-2.5 rounded-full hover:bg-slate-50 transition-all shadow-sm whitespace-nowrap shrink-0 hover:border-slate-300 hover:shadow-md duration-300">
                 + New Booking
               </Link>
 
-              {/* Divider */}
-              <div className="h-5 w-px bg-slate-200 mx-1"></div>
+              <div className="hidden sm:block h-6 w-px bg-slate-200 mx-2"></div>
 
-              {/* Sign Out */}
-              <Link href="/login" className="text-slate-400 hover:text-rose-500 transition-colors flex items-center p-2 rounded-full hover:bg-rose-50" title="Sign Out">
-                {Icons.SignOut}
-              </Link>
+              {/* Desktop Only Actions */}
+              <div className="hidden sm:flex items-center gap-3">
+                <Link href="/login" className="text-slate-400 hover:text-rose-500 transition-colors p-2 rounded-full hover:bg-rose-50" title="Sign Out">
+                  {Icons.SignOut}
+                </Link>
 
-              {/* User Avatar */}
-              <Link href="/admin/profile" className="w-9 h-9 rounded-full border border-slate-200 bg-white flex items-center justify-center text-xs font-bold text-slate-700 hover:border-slate-400 transition-colors shadow-sm">
-                AW
+                <Link href="/admin/profile" className="w-10 h-10 rounded-full border border-slate-200 bg-white flex items-center justify-center text-sm font-bold text-slate-700 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm">
+                  AW
+                </Link>
+              </div>
+
+              {/* Mobile/Tablet menu button */}
+              <button
+                onClick={() => setMobileMenuOpen(true)}
+                className="lg:hidden relative p-2 text-slate-600 hover:text-blue-600 transition-colors rounded-full hover:bg-blue-50"
+              >
+                {Icons.Menu}
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile/Tablet Slide-out Drawer */}
+      <div 
+        className={`fixed inset-0 z-[100] lg:hidden transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+      >
+        {/* Backdrop */}
+        <div 
+          className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+        
+        {/* Drawer Panel */}
+        <div 
+          className={`absolute top-0 right-0 h-full w-[85%] max-w-[360px] bg-white shadow-2xl transition-transform duration-300 ease-out flex flex-col ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        >
+          {/* Drawer Header */}
+          <div className="flex items-center justify-between p-6 border-b border-slate-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md">
+                <span className="text-white font-black text-lg">P</span>
+              </div>
+              <div>
+                <h2 className="font-extrabold text-lg text-slate-900 leading-tight">Prime Wheels</h2>
+                <p className="text-xs font-medium text-slate-500">Admin Portal</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-colors"
+            >
+              {Icons.Close}
+            </button>
+          </div>
+
+          {/* Drawer Content - Scrollable */}
+          <div className="flex-1 overflow-y-auto py-6 px-4">
+            <div className="mb-6 px-2 sm:hidden">
+              <Link 
+                href="/admin/bookings" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl hover:bg-slate-800 transition-colors shadow-md"
+              >
+                + New Booking
               </Link>
             </div>
 
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden text-slate-500 hover:text-slate-900 p-2"
-            >
-              {mobileMenuOpen ? Icons.Close : Icons.Menu}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Dropdown Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200 bg-white shadow-lg">
-            <nav className="px-4 py-4 space-y-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  href={item.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-bold
-                          ${isActive(item.path) ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-50'}
-                       `}
-                >
-                  {item.icon}
-                  {item.name}
-                </Link>
-              ))}
-              <div className="h-px bg-slate-100 my-4"></div>
-              <Link href="/login" className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-bold text-rose-600 hover:bg-rose-50">
-                {Icons.SignOut}
-                Sign Out
-              </Link>
+            <nav className="space-y-1.5">
+              {navItems.map((item) => {
+                const active = isActive(item.path);
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl text-base font-bold transition-all
+                            ${active 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                            }`}
+                  >
+                    <span className={`${active ? 'text-blue-600' : 'text-slate-400'}`}>
+                      {item.icon}
+                    </span>
+                    {item.name}
+                  </Link>
+                );
+              })}
             </nav>
           </div>
-        )}
-      </header>
+
+          {/* Drawer Footer */}
+          <div className="p-6 border-t border-slate-100 bg-slate-50">
+            <div className="flex items-center justify-between">
+              <Link href="/admin/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 group">
+                <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-sm font-bold text-slate-700 group-hover:border-blue-400 group-hover:text-blue-600 shadow-sm transition-all">
+                  AW
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Admin Workspace</p>
+                  <p className="text-xs font-medium text-slate-500">View Profile</p>
+                </div>
+              </Link>
+              <Link href="/login" className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-colors" title="Sign Out">
+                {Icons.SignOut}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Main Page Content */}
-      <main className="flex-1 w-full max-w-[1400px] mx-auto pt-8 pb-12 px-4 sm:px-6 md:px-8">
+      <main className="flex-1 w-full max-w-[1400px] mx-auto pt-6 pb-12 px-4 sm:px-6 lg:px-8">
         {children}
       </main>
 
     </div>
   );
 }
+
