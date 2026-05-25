@@ -203,6 +203,45 @@ export default function RegistrationForm() {
                 <option value="Yogyakarta">Yogyakarta</option>
                 <option value="Bali">Bali</option>
                 <option value="Medan">Medan</option>
+                <option value="Malang">Malang</option>
+                <option value="Makassar">Makassar</option>
+                <option value="Samarinda">Samarinda</option>
+                <option value="Solo">Solo</option>
+                <option value="Pontianak">Pontianak</option>
+                <option value="Palembang">Palembang</option>
+                <option value="Lampung">Lampung</option>
+                <option value="Banten">Banten</option>
+                <option value="Kalimantan Utara">Kalimantan Utara</option>
+                <option value="Kalimantan Tengah">Kalimantan Tengah</option>
+                <option value="Kalimantan Barat">Kalimantan Barat</option>
+                <option value="Kalimantan Selatan">Kalimantan Selatan</option>
+                <option value="Kalimantan Timur">Kalimantan Timur</option>
+                <option value="Bangka Belitung">Bangka Belitung</option>
+                <option value="Bengkulu">Bengkulu</option>
+                <option value="Jambi">Jambi</option>
+                <option value="Kepulauan Riau">Kepulauan Riau</option>
+                <option value="Lampung">Lampung</option>
+                <option value="Riau">Riau</option>
+                <option value="Sumatera Barat">Sumatera Barat</option>
+                <option value="Sumatera Selatan">Sumatera Selatan</option>
+                <option value="Sumatera Utara">Sumatera Utara</option>
+                <option value="Aceh">Aceh</option>
+                <option value="Sulawesi Tenggara">Sulawesi Tenggara</option>
+                <option value="Sulawesi Selatan">Sulawesi Selatan</option>
+                <option value="Sulawesi Utara">Sulawesi Utara</option>
+                <option value="Sulawesi Barat">Sulawesi Barat</option>
+                <option value="Sulawesi Tengah">Sulawesi Tengah</option>
+                <option value="Gorontalo">Gorontalo</option>
+                <option value="Papua">Papua</option>
+                <option value="Papua Barat">Papua Barat</option>
+                <option value="Papua Selatan">Papua Selatan</option>
+                <option value="Papua Tengah">Papua Tengah</option>
+                <option value="Papua Pegunungan">Papua Pegunungan</option>
+                <option value="Nusa Tenggara Barat">Nusa Tenggara Barat</option>
+                <option value="Nusa Tenggara Timur">Nusa Tenggara Timur</option>
+                <option value="Nusa Tenggara Barat">Nusa Tenggara Barat</option>
+                <option value="Nusa Tenggara Timur">Nusa Tenggara Timur</option>
+                
               </select>
             </div>
 
